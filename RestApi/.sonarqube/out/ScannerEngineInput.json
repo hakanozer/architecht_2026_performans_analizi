@@ -1,0 +1,92 @@
+{
+  "scannerProperties": [
+    {
+      "key": "sonar.scanner.app",
+      "value": "ScannerMSBuild"
+    },
+    {
+      "key": "sonar.scanner.appVersion",
+      "value": "10.4.1"
+    },
+    {
+      "key": "sonar.projectKey",
+      "value": "isnet"
+    },
+    {
+      "key": "sonar.working.directory",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/.sonar"
+    },
+    {
+      "key": "sonar.projectBaseDir",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi"
+    },
+    {
+      "key": "sonar.pullrequest.cache.basepath",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi"
+    },
+    {
+      "key": "sonar.sources",
+      "value": ""
+    },
+    {
+      "key": "sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "sonar.modules",
+      "value": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.projectKey",
+      "value": "isnet:F50F3CB5-E4F6-4FF7-A558-0812A4DF4783"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.projectName",
+      "value": "RestApi"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.projectBaseDir",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.working.directory",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/.sonar/mod0"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.sourceEncoding",
+      "value": "utf-8"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.tests",
+      "value": ""
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.sources",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/NoteController.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/ProductController.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/CustomValids/CityValid.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalExceptionHandler.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.Designer.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/ApplicationDbContextModelSnapshot.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/dto/UserLoginDto.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Note.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Product.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/User.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Services/PasswordManager.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/RestApi.GlobalUsings.g.cs,\"/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/.NETCoreApp,Version=v9.0.AssemblyAttributes.cs\",/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/RestApi.AssemblyInfo.cs,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/appsettings.Development.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/appsettings.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/restapi.db,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Properties/launchSettings.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/RestApi.csproj.nuget.dgspec.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/project.assets.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/staticwebassets.build.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/staticwebassets.build.endpoints.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/rjsmrazor.dswa.cache.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/rjsmcshtml.dswa.cache.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/RestApi.sourcelink.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/obj/Debug/net9.0/rpswa.dswa.cache.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/bin/Debug/net9.0/RestApi.deps.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/bin/Debug/net9.0/appsettings.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/bin/Debug/net9.0/RestApi.runtimeconfig.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/bin/Debug/net9.0/RestApi.staticwebassets.endpoints.json,/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/bin/Debug/net9.0/appsettings.Development.json"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.cs.analyzer.projectOutPaths",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/0"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.cs.roslyn.reportFilePaths",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/0/Issues.json"
+    },
+    {
+      "key": "F50F3CB5-E4F6-4FF7-A558-0812A4DF4783.sonar.cs.scanner.telemetry",
+      "value": "/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/0/Telemetry.json"
+    },
+    {
+      "key": "sonar.token",
+      "value": "***"
+    },
+    {
+      "key": "sonar.host.url",
+      "value": "http://localhost:9000"
+    },
+    {
+      "key": "sonar.visualstudio.enable",
+      "value": "false"
+    }
+  ]
+}

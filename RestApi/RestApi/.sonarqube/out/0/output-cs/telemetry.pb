@@ -1,0 +1,1 @@
+SR=/Users/hakan/Documents/flo_2025_dotnet/RestApi/RestApi.csproj¢net9.0òCSharp13

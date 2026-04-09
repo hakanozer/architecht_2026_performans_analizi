@@ -1,0 +1,1 @@
+/Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/.sonarqube/out/0

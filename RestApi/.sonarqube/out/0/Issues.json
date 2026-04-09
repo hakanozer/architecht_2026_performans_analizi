@@ -1,0 +1,1609 @@
+{
+  "$schema": "http://json.schemastore.org/sarif-1.0.0",
+  "version": "1.0.0",
+  "runs": [
+    {
+      "tool": {
+        "name": "Microsoft (R) Visual C# Derleyicisi",
+        "version": "4.14.0.0",
+        "fileVersion": "4.14.0-3.25262.10 (8edf7bcd)",
+        "semanticVersion": "4.14.0",
+        "language": "tr-TR"
+      },
+      "results": [
+        {
+          "ruleId": "CS8618",
+          "level": "warning",
+          "message": "Null atanamaz özellik 'Users', oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. 'Gerekli' değiştiricisini ekleyin veya özellik değerini null atanabilir olarak bildirmeyi göz önünde bulundurun.",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 16,
+                  "endLine": 8,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 28,
+                  "endLine": 10,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CS8618",
+          "level": "warning",
+          "message": "Null atanamaz özellik 'Notes', oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. 'Gerekli' değiştiricisini ekleyin veya özellik değerini null atanabilir olarak bildirmeyi göz önünde bulundurun.",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 16,
+                  "endLine": 8,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 28,
+                  "endLine": 11,
+                  "endColumn": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CS8618",
+          "level": "warning",
+          "message": "Null atanamaz özellik 'Products', oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. 'Gerekli' değiştiricisini ekleyin veya özellik değerini null atanabilir olarak bildirmeyi göz önünde bulundurun.",
+          "suppressionStates": [
+            "suppressedInSource"
+          ],
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 16,
+                  "endLine": 8,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Data/ApplicationDbContext.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 31,
+                  "endLine": 12,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CS8603",
+          "level": "warning",
+          "message": "Olası null başvuru dönüşü.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/CustomValids/CityValid.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 24,
+                  "endLine": 12,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CS8604",
+          "level": "warning",
+          "message": "'byte[] Encoding.GetBytes(string s)' içindeki 's' parametresi için olası null başvuru bağımsız değişkeni.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 43,
+                  "endLine": 13,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CS8604",
+          "level": "warning",
+          "message": "'byte[] Encoding.GetBytes(string s)' içindeki 's' parametresi için olası null başvuru bağımsız değişkeni.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 48,
+                  "startColumn": 35,
+                  "endLine": 48,
+                  "endColumn": 84
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 128,
+                  "startColumn": 13,
+                  "endLine": 128,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 134,
+                  "startColumn": 13,
+                  "endLine": 134,
+                  "endColumn": 89
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6418",
+          "level": "warning",
+          "message": "\"_secretKey\" detected here, make sure this is not a hard-coded secret.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/appsettings.json",
+                "region": {
+                  "startLine": 16,
+                  "startColumn": 20,
+                  "endLine": 16,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 9,
+                  "endLine": 18,
+                  "endColumn": 79
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 9,
+                  "endLine": 23,
+                  "endColumn": 92
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 13,
+                  "endLine": 31,
+                  "endColumn": 66
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 1,
+                  "endLine": 33,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 93,
+                  "startColumn": 5,
+                  "endLine": 93,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 116,
+                  "startColumn": 9,
+                  "endLine": 116,
+                  "endColumn": 142
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S125",
+          "level": "warning",
+          "message": "Remove this commented out code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 137,
+                  "startColumn": 1,
+                  "endLine": 137,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1050",
+          "level": "note",
+          "message": "Ad alanlarında türleri bildirin",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 14,
+                  "endLine": 7,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1050",
+          "level": "note",
+          "message": "Ad alanlarında türleri bildirin",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 14,
+                  "endLine": 5,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1050",
+          "level": "note",
+          "message": "Ad alanlarında türleri bildirin",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalExceptionHandler.cs",
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 14,
+                  "endLine": 2,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2933",
+          "level": "warning",
+          "message": "Make '_secretKey' 'readonly'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Services/PasswordManager.cs",
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 24,
+                  "endLine": 13,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S4487",
+          "level": "warning",
+          "message": "Remove this unread private field '_iv' or refactor the code to use its value.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Services/PasswordManager.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 33,
+                  "endLine": 12,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'GlobalExceptionHandler' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalExceptionHandler.cs",
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 14,
+                  "endLine": 2,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'Startup' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 14,
+                  "endLine": 7,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3903",
+          "level": "warning",
+          "message": "Move 'GlobalMiddleware' into a named namespace.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 14,
+                  "endLine": 5,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3376",
+          "level": "warning",
+          "message": "Make this class name end with 'Attribute'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/CustomValids/CityValid.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 18,
+                  "endLine": 5,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3993",
+          "level": "warning",
+          "message": "Specify AttributeUsage on 'CityValid'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/CustomValids/CityValid.cs",
+                "region": {
+                  "startLine": 5,
+                  "startColumn": 18,
+                  "endLine": 5,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'INTEGER' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.cs",
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 50,
+                  "endLine": 17,
+                  "endColumn": 59
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.cs",
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 50,
+                  "endLine": 31,
+                  "endColumn": 59
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.cs",
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 50,
+                  "endLine": 46,
+                  "endColumn": 59
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Migrations/20250311115221_InitialCreate.cs",
+                "region": {
+                  "startLine": 49,
+                  "startColumn": 54,
+                  "endLine": 49,
+                  "endColumn": 63
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1125",
+          "level": "warning",
+          "message": "Remove the unnecessary Boolean literal(s).",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 36,
+                  "endLine": 34,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S5344",
+          "level": "warning",
+          "message": "Use at least 100,000 iterations here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Services/PasswordManager.cs",
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 17,
+                  "endLine": 33,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Note.cs",
+                "region": {
+                  "startLine": 9,
+                  "startColumn": 20,
+                  "endLine": 9,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/User.cs",
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 20,
+                  "endLine": 8,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Product.cs",
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 20,
+                  "endLine": 8,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Note.cs",
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 20,
+                  "endLine": 15,
+                  "endColumn": 26
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Models/Product.cs",
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 24,
+                  "endLine": 14,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1125",
+          "level": "warning",
+          "message": "Remove the unnecessary Boolean literal(s).",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 124,
+                  "startColumn": 36,
+                  "endLine": 124,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'Configure' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 17,
+                  "endLine": 34,
+                  "endColumn": 26
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1125",
+          "level": "warning",
+          "message": "Remove the unnecessary Boolean literal(s).",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 36,
+                  "endLine": 47,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GenerateSecureKey' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Services/PasswordManager.cs",
+                "region": {
+                  "startLine": 107,
+                  "startColumn": 19,
+                  "endLine": 107,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'ii'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/NoteController.cs",
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 17,
+                  "endLine": 60,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2092",
+          "level": "warning",
+          "message": "Make sure creating this cookie without setting the 'Secure' property is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 107,
+                  "startColumn": 68,
+                  "endLine": 107,
+                  "endColumn": 185
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2077",
+          "level": "warning",
+          "message": "Make sure using a dynamically formatted SQL query is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 132,
+                  "startColumn": 23,
+                  "endLine": 132,
+                  "endColumn": 55
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 130,
+                  "startColumn": 17,
+                  "endLine": 130,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "SQL Query is dynamically formatted and assigned to query."
+            }
+          }
+        },
+        {
+          "ruleId": "MVC1005",
+          "level": "warning",
+          "message": "Using 'UseMvc' to configure MVC is not supported while using Endpoint Routing. To continue using 'UseMvc', please set 'MvcOptions.EnableEndpointRouting = false' inside 'ConfigureServices'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 9,
+                  "endLine": 47,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0000",
+          "level": "warning",
+          "message": "Calling 'BuildServiceProvider' from application code results in an additional copy of singleton services being created. Consider alternatives such as dependency injecting services as parameters to 'Configure'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Startup.cs",
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 40,
+                  "endLine": 12,
+                  "endColumn": 71
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'ParseRole' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 22,
+                  "endLine": 112,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Middleware/GlobalMiddleware.cs",
+                "region": {
+                  "startLine": 25,
+                  "startColumn": 26,
+                  "endLine": 25,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "User-Agent",
+              "ResolvedPropertyName": "UserAgent"
+            }
+          }
+        },
+        {
+          "ruleId": "CA1822",
+          "level": "note",
+          "message": "'ParseRole' adlı üye örnek verilerine erişmiyor ve statik olarak işaretlenebilir",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 22,
+                  "endLine": 112,
+                  "endColumn": 31
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'X-Content-Type-Options' can be accessed using the XContentTypeOptions property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 111,
+                  "startColumn": 5,
+                  "endLine": 111,
+                  "endColumn": 55
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "X-Content-Type-Options",
+              "ResolvedPropertyName": "XContentTypeOptions"
+            }
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'X-Frame-Options' can be accessed using the XFrameOptions property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 5,
+                  "endLine": 112,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "X-Frame-Options",
+              "ResolvedPropertyName": "XFrameOptions"
+            }
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'X-XSS-Protection' can be accessed using the XXSSProtection property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 113,
+                  "startColumn": 5,
+                  "endLine": 113,
+                  "endColumn": 49
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "X-XSS-Protection",
+              "ResolvedPropertyName": "XXSSProtection"
+            }
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'Strict-Transport-Security' can be accessed using the StrictTransportSecurity property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 119,
+                  "startColumn": 5,
+                  "endLine": 119,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "Strict-Transport-Security",
+              "ResolvedPropertyName": "StrictTransportSecurity"
+            }
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'Content-Security-Policy' can be accessed using the ContentSecurityPolicy property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 120,
+                  "startColumn": 5,
+                  "endLine": 120,
+                  "endColumn": 56
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "Content-Security-Policy",
+              "ResolvedPropertyName": "ContentSecurityPolicy"
+            }
+          }
+        },
+        {
+          "ruleId": "S6966",
+          "level": "warning",
+          "message": "Await RunAsync instead.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///Users/hakan/Documents/GitHub/isnet_2025_security/RestApi/RestApi/Program.cs",
+                "region": {
+                  "startLine": 155,
+                  "startColumn": 1,
+                  "endLine": 155,
+                  "endColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        }
+      ],
+      "rules": {
+        "ASP0000": {
+          "id": "ASP0000",
+          "shortDescription": "Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'",
+          "defaultLevel": "warning",
+          "helpUri": "https://aka.ms/AA5k895",
+          "properties": {
+            "category": "Design",
+            "isEnabledByDefault": true
+          }
+        },
+        "ASP0015": {
+          "id": "ASP0015",
+          "shortDescription": "Suggest using IHeaderDictionary properties",
+          "defaultLevel": "note",
+          "helpUri": "https://aka.ms/aspnet/analyzers",
+          "properties": {
+            "category": "Usage",
+            "isEnabledByDefault": true
+          }
+        },
+        "CA1050": {
+          "id": "CA1050",
+          "shortDescription": "Ad alanlarında türleri bildirin",
+          "fullDescription": "Ad çakışmalarını engellemek amacıyla ve ilgili türleri bir nesne hiyerarşisinde düzenleme yöntemi olarak ad alanlarında türler bildirilir.",
+          "defaultLevel": "note",
+          "helpUri": "https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1050",
+          "properties": {
+            "category": "Design",
+            "isEnabledByDefault": true,
+            "tags": [
+              "PortedFromFxCop",
+              "Telemetry",
+              "EnabledRuleInAggressiveMode"
+            ]
+          }
+        },
+        "CA1822": {
+          "id": "CA1822",
+          "shortDescription": "Üyeleri statik olarak işaretleyin",
+          "fullDescription": "Örnek verilerine erişmeyen veya örnek yöntemlerini çağırmayan üyeler statik olarak işaretlenebilir. Yöntemleri statik olarak işaretledikten sonra, derleyici bu üyelere yönelik sanal olmayan çağrı konumlarını gösterir. Bu, performans açısından duyarlı kod için önemli ölçüde performans kazanımı sağlar.",
+          "defaultLevel": "note",
+          "helpUri": "https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1822",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true,
+            "tags": [
+              "PortedFromFxCop",
+              "Telemetry",
+              "EnabledRuleInAggressiveMode"
+            ]
+          }
+        },
+        "CS8603": {
+          "id": "CS8603",
+          "shortDescription": "Olası null başvuru dönüşü.",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS8603)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "CS8604": {
+          "id": "CS8604",
+          "shortDescription": "Olası null başvuru bağımsız değişkeni.",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS8604)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "CS8618": {
+          "id": "CS8618",
+          "shortDescription": "Null atanamaz alan, oluşturucudan çıkış yaparken null olmayan bir değer içermelidir. 'Gerekli' değiştiricisini ekleyin veya null atanabilir olarak bildirmeyi göz önünde bulundurun.",
+          "defaultLevel": "warning",
+          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS8618)",
+          "properties": {
+            "category": "Compiler",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Compiler",
+              "Telemetry"
+            ]
+          }
+        },
+        "MVC1005": {
+          "id": "MVC1005",
+          "shortDescription": "Cannot use UseMvc with Endpoint Routing",
+          "defaultLevel": "warning",
+          "helpUri": "https://aka.ms/YJggeFn",
+          "properties": {
+            "category": "Usage",
+            "isEnabledByDefault": true
+          }
+        },
+        "S1125": {
+          "id": "S1125",
+          "shortDescription": "Boolean literals should not be redundant",
+          "fullDescription": "A boolean literal can be represented in two different ways: true or false. They can be combined with logical operators (!, &&, ||, ==, !=) to produce logical expressions that represent truth values. However, comparing a boolean literal to a variable or expression that evaluates to a boolean value is unnecessary and can make the code harder to read and understand. The more complex a boolean expression is, the harder it will be for developers to understand its meaning and expected behavior, and it will favour the introduction of new bugs.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1125",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1192": {
+          "id": "S1192",
+          "shortDescription": "String literals should not be duplicated",
+          "fullDescription": "Duplicated string literals make the process of refactoring complex and error-prone, as any change would need to be propagated on all occurrences.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1192",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": false,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S125": {
+          "id": "S125",
+          "shortDescription": "Sections of code should not be commented out",
+          "fullDescription": "Commented-out code distracts the focus from the actual executed code. It creates a noise that increases maintenance code. And because it is never executed, it quickly becomes out of date and invalid.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-125",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S1481": {
+          "id": "S1481",
+          "shortDescription": "Unused local variables should be removed",
+          "fullDescription": "An unused local variable is a variable that has been declared but is not used anywhere in the block of code where it is defined. It is dead code, contributing to unnecessary complexity and leading to confusion when reading the code. Therefore, it should be removed from your code to maintain clarity and efficiency.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-1481",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2077": {
+          "id": "S2077",
+          "shortDescription": "Formatting SQL queries is security-sensitive",
+          "fullDescription": "Formatted SQL queries can be difficult to maintain, debug and can increase the risk of SQL injection when concatenating untrusted values into the query. However, this rule doesn’t detect SQL injections (unlike rule {rule:csharpsquid:S3649}), the goal is only to highlight complex/formatted queries.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2077",
+          "properties": {
+            "category": "Major Security Hotspot",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2092": {
+          "id": "S2092",
+          "shortDescription": "Creating cookies without the \"secure\" flag is security-sensitive",
+          "fullDescription": "When a cookie is protected with the secure attribute set to true it will not be send by the browser over an unencrypted HTTP request and thus cannot be observed by an unauthorized person during a man-in-the-middle attack.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2092",
+          "properties": {
+            "category": "Minor Security Hotspot",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2325": {
+          "id": "S2325",
+          "shortDescription": "Methods and properties that don't access instance data should be static",
+          "fullDescription": "Methods and properties that don’t access instance data should be marked as static for the following reasons:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2325",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S2933": {
+          "id": "S2933",
+          "shortDescription": "Fields that are only assigned in the constructor should be \"readonly\"",
+          "fullDescription": "readonly fields can only be assigned in a class constructor. If a class has a field that’s not marked readonly but is only set in the constructor, it could cause confusion about the field’s intended use. To avoid confusion, such fields should be marked readonly to make their intended use explicit, and to prevent future maintainers from inadvertently changing their use.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-2933",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3376": {
+          "id": "S3376",
+          "shortDescription": "Attribute, EventArgs, and Exception type names should end with the type being extended",
+          "fullDescription": "Adherence to the standard naming conventions makes your code not only more readable, but more usable. For instance, class FirstAttribute : Attribute can be used simply with First, but you must use the full name for class AttributeOne : Attribute.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3376",
+          "properties": {
+            "category": "Minor Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3903": {
+          "id": "S3903",
+          "shortDescription": "Types should be defined in named namespaces",
+          "fullDescription": "Types are declared in namespaces in order to prevent name collisions and as a way to organize them into the object hierarchy. Types that are defined outside any named namespace are in a global namespace that cannot be referenced in code.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3903",
+          "properties": {
+            "category": "Major Bug",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S3993": {
+          "id": "S3993",
+          "shortDescription": "Custom attributes should be marked with \"System.AttributeUsageAttribute\"",
+          "fullDescription": "When defining custom attributes, AttributeUsageAttribute must be used to indicate where the attribute can be applied. This will:",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-3993",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S4487": {
+          "id": "S4487",
+          "shortDescription": "Unread \"private\" fields should be removed",
+          "fullDescription": "Private fields which are written but never read are a case of \"dead store\". Changing the value of such a field is useless and most probably indicates an error in the code.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-4487",
+          "properties": {
+            "category": "Critical Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S5344": {
+          "id": "S5344",
+          "shortDescription": "Passwords should not be stored in plaintext or with a fast hashing algorithm",
+          "fullDescription": "The improper storage of passwords poses a significant security risk to software applications. This vulnerability arises when passwords are stored in plaintext or with a fast hashing algorithm. To exploit this vulnerability, an attacker typically requires access to the stored passwords.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-5344",
+          "properties": {
+            "category": "Critical Vulnerability",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S6418": {
+          "id": "S6418",
+          "shortDescription": "Hard-coded secrets are security-sensitive",
+          "fullDescription": "Because it is easy to extract strings from an application source code or binary, secrets should not be hard-coded. This is particularly true for applications that are distributed or that are open-source.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-6418",
+          "properties": {
+            "category": "Blocker Security Hotspot",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S6964": {
+          "id": "S6964",
+          "shortDescription": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "fullDescription": "\"Under-posting\" refers to a situation where a client sends less data than expected to the server during an HTTP request, for example when the client omits some properties from the request body that the server expects to receive.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-6964",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "SonarWay"
+            ]
+          }
+        },
+        "S6966": {
+          "id": "S6966",
+          "shortDescription": "Awaitable method should be used",
+          "fullDescription": "In an async method, any blocking operations should be avoided.",
+          "defaultLevel": "warning",
+          "helpUri": "https://rules.sonarsource.com/csharp/RSPEC-6966",
+          "properties": {
+            "category": "Major Code Smell",
+            "isEnabledByDefault": true,
+            "tags": [
+              "C#",
+              "MainSourceScope",
+              "TestSourceScope",
+              "SonarWay"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
