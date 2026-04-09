@@ -3,9 +3,16 @@ using RestApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.IO;
+using System;
 using System.Threading.RateLimiting;
+// Avoid referencing Microsoft.IdentityModel.Logging here to prevent loading it before we confirm startup is successful
 
-var builder = WebApplication.CreateBuilder(args);
+try
+{
+    Console.WriteLine("[Startup] BEGIN");
+    var builder = WebApplication.CreateBuilder(args);
+    Console.WriteLine("[Startup] Builder created");
 
 // Rate Limiting
 builder.Services.AddRateLimiter(options => // Rate limiting servisini ekliyoruz
@@ -45,7 +52,13 @@ builder.Services.AddCors(options =>
 */
 
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Jwt:Key"));
+var jwtKey = builder.Configuration.GetValue<string>("Jwt:Key");
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT Key is not configured in appsettings.json");
+}
+var key = Encoding.ASCII.GetBytes(jwtKey);
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -83,7 +96,9 @@ builder.Services.AddAntiforgery(options =>
     options.SuppressXFrameOptionsHeader = true;
 });
 
-var app = builder.Build();
+    Console.WriteLine("[Startup] Building app");
+    var app = builder.Build();
+    Console.WriteLine("[Startup] App built");
 
 // https config
 if (!app.Environment.IsDevelopment())
@@ -152,4 +167,54 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+// Register unhandled exception handlers as early as possible
+try
+{
+    File.AppendAllText("startup_trace.log", DateTime.Now + " - registering unhandled exception handlers\n");
+}
+catch { }
+AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+{
+    try
+    {
+        var exObj = e.ExceptionObject as Exception;
+        var txt = "[UnhandledException] " + (exObj?.ToString() ?? e.ExceptionObject?.ToString()) + "\n";
+        Console.WriteLine(txt);
+        File.AppendAllText("startup_trace.log", DateTime.Now + " - " + txt);
+    }
+    catch { }
+};
+
+TaskScheduler.UnobservedTaskException += (sender, e) =>
+{
+    try
+    {
+        var txt = "[UnobservedTaskException] " + e.Exception?.ToString() + "\n";
+        Console.WriteLine(txt);
+        File.AppendAllText("startup_trace.log", DateTime.Now + " - " + txt);
+        e.SetObserved();
+    }
+    catch { }
+};
+
+    try
+    {
+        app.Run();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("[Host terminated] " + ex.ToString());
+        throw;
+    }
+}
+catch (Exception ex)
+{
+    // If startup fails log to console and to a file for diagnosis
+    try
+    {
+        Console.WriteLine("[Startup FAILED] " + ex.ToString());
+        File.AppendAllText("startup_errors.log", DateTime.Now + "\n" + ex.ToString() + "\n\n");
+    }
+    catch { }
+    throw;
+}
