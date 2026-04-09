@@ -5,9 +5,9 @@ receivers:
       http:
 
 exporters:
-  logging:
-  jaeger:
-    endpoint: jaeger:14250
+  debug:
+  otlp:
+    endpoint: jaeger:4317
     tls:
       insecure: true
 
@@ -15,4 +15,4 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [logging, jaeger]
+      exporters: [debug, otlp]
