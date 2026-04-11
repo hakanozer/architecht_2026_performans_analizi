@@ -57,6 +57,7 @@ namespace RestApi.Controllers
         public IActionResult GetAll()
         {
             var products = _context.Products.ToList();
+            Util.Util.ls.Add(products);
             return Ok(products);
         }
     }

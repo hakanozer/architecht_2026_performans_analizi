@@ -15,6 +15,7 @@ try
     Console.WriteLine("[Startup] Builder created");
 
 // Rate Limiting
+/*
 builder.Services.AddRateLimiter(options => // Rate limiting servisini ekliyoruz
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext => // Global rate limiter tanımı (tüm uygulamaya uygulanır)
@@ -28,6 +29,7 @@ builder.Services.AddRateLimiter(options => // Rate limiting servisini ekliyoruz
                 Window = TimeSpan.FromSeconds(10) // 10 saniyelik sabit pencere süresi
             }));
 });
+*/
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -111,6 +113,7 @@ if (!app.Environment.IsDevelopment())
 
 
 // Güvenlik Headers
+/*
 app.Use(async (context, next) =>
 {
 
@@ -147,6 +150,7 @@ app.Use(async (context, next) =>
         "camera 'none'; microphone 'none';";
     await next();
 });
+*/
 
 // Configure Cors policy
 //app.UseCors(MyAllowSpecificOrigins);
@@ -158,9 +162,9 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseMiddleware<GlobalExceptionHandler>();
+// app.UseMiddleware<GlobalExceptionHandler>();
 app.UseMiddleware<GlobalMiddleware>();
-app.UseRateLimiter();
+//app.UseRateLimiter();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

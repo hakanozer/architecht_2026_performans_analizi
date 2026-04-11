@@ -24,30 +24,32 @@ public class GlobalExceptionHandler
 
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
     {
-
-        // Detaylı log - sunucu tarafında
-        _logger?.LogError(
-            exception,
-            "Unhandled exception: {Message} | Path: {Path} | User: {User} | IP: {IP}",
-            exception.Message,
-            httpContext.Request.Path,
-            httpContext.User?.FindFirst("sub")?.Value,
-            httpContext.Connection.RemoteIpAddress?.ToString()
-        );
-
-
-        // Kullanıcıya asla detay verme
-        var response = new
+        // 1. Response'un gönderilip gönderilmediğini KONTROL ET
+        if (httpContext.Response.HasStarted)
         {
-            error = "An unexpected error occurred. Please try again later.",
-            code = Guid.NewGuid().ToString(),
-            timestamp = DateTime.UtcNow
-        };
+            _logger.LogWarning("Response zaten başladığı için hata detayı yazılamadı.");
+            return;
+        }
 
-        httpContext.Response.Clear();
-        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        httpContext.Response.ContentType = "application/json";
+        try
+        {
+            _logger.LogError(exception, "Unhandled exception...");
 
-        await httpContext.Response.WriteAsJsonAsync(response);
+            var response = new
+            {
+                error = "An unexpected error occurred.",
+                code = Guid.NewGuid().ToString()
+            };
+
+            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            httpContext.Response.ContentType = "application/json";
+
+            await httpContext.Response.WriteAsJsonAsync(response);
+        }
+        catch (Exception logEx)
+        {
+            // Hata yakalayıcının hata fırlatmasını engelle!
+            // En kötü senaryoda sessizce çık veya çok temel bir log at.
+        }
     }
 }
