@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   prometheus:
     image: prom/prometheus
@@ -48,7 +50,6 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.3
     container_name: kibana
-    # Önceki hatalı 'command' satırını sildik!
     ports:
       - "5601:5601"
     depends_on:
@@ -85,3 +86,41 @@ services:
     depends_on:
       - jaeger
     restart: unless-stopped
+
+  # ✅ SONARQUBE
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      - sonarqube_db
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube_db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    restart: unless-stopped
+
+  # ✅ SONAR DB
+  sonarqube_db:
+    image: postgres:13
+    container_name: sonarqube_db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - sonarqube_postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgresql:
+  postgresql_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  sonarqube_postgres:
