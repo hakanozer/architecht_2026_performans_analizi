@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uygulama Entegrasyonu — Performans Analizi &amp; Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --accent: #0d47a1;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, #0d47a1, #1565c0);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--accent); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 Uygulama Entegrasyonu</h1>
+        <p>Mod&uuml;l 6 — T&uuml;m Monitoring Araçlarının .NET Core REST API'ye Tam Entegrasyonu</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş &amp; Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus &amp; Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch &amp; Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik &amp; Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html" class="active">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard &amp; G&ouml;rselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Genel Bakış -->
+        <div class="card">
+            <h2>🎯 Entegrasyon Genel Bakış</h2>
+            <p>Bu mod&uuml;lde, &ouml;nceki derslerde &ouml;ğrendiğimiz t&uuml;m araçları tek bir .NET Core REST API projesine adım adım entegre edeceğiz.</p>
+
+            <h3>Entegre Edilecek Bileşenler</h3>
+            <pre><code>
+┌────────────────────────────────────────────────────────────────┐
+│                    .NET Core REST API                           │
+│                                                                │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │                  Program.cs Entegrasyonları                │ │
+│  │                                                           │ │
+│  │  ✅ OpenTelemetry (Traces + Metrics + Logs)               │ │
+│  │  ✅ Serilog → Elasticsearch                               │ │
+│  │  ✅ Prometheus Exporter (/metrics)                        │ │
+│  │  ✅ Health Checks (/health)                               │ │
+│  │  ✅ Custom Metrics (ProductMetrics)                       │ │
+│  │  ✅ Custom Traces (ActivitySource)                        │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                          │                                      │
+│                   Telemetri Çıkışları                           │
+│          ┌───────────┼───────────┐                             │
+│          ▼           ▼           ▼                             │
+│    OTel Collector  Prometheus  Elasticsearch                   │
+│    → Jaeger       → Grafana   → Kibana                        │
+└────────────────────────────────────────────────────────────────┘</code></pre>
+        </div>
+
+        <!-- Adım 1: NuGet Paketleri -->
+        <div class="card">
+            <h2><span class="step-number">1</span> NuGet Paketlerini Y&uuml;kleme</h2>
+
+            <pre><code>cd RestApi/RestApi
+
+# OpenTelemetry Temel
+dotnet add package OpenTelemetry --version 1.10.0
+dotnet add package OpenTelemetry.Extensions.Hosting --version 1.10.0
+
+# OpenTelemetry Traces
+dotnet add package OpenTelemetry.Instrumentation.AspNetCore --version 1.10.1
+dotnet add package OpenTelemetry.Instrumentation.Http --version 1.10.1
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol --version 1.10.0
+
+# OpenTelemetry Metrics
+dotnet add package OpenTelemetry.Instrumentation.Runtime --version 1.10.0
+dotnet add package OpenTelemetry.Exporter.Prometheus.AspNetCore --version 1.10.0-rc.1
+
+# Serilog
+dotnet add package Serilog.AspNetCore
+dotnet add package Serilog.Sinks.Elasticsearch
+dotnet add package Serilog.Enrichers.Environment
+dotnet add package Serilog.Enrichers.Process
+dotnet add package Serilog.Enrichers.Thread
+dotnet add package Serilog.Formatting.Elasticsearch
+
+# Health Checks
+dotnet add package AspNetCore.HealthChecks.Sqlite</code></pre>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Not:</strong> Paket versiyonları zaman i&ccedil;inde değişebilir. <span class="inline-code">dotnet add package</span> komutu en son stabil versiyonu otomatik y&uuml;kler. Prometheus exporter'ı şu an RC (Release Candidate) s&uuml;r&uuml;m&uuml;ndedir.
+            </div>
+        </div>
+
+        <!-- Adım 2: Program.cs -->
+        <div class="card">
+            <h2><span class="step-number">2</span> Program.cs — Tam Entegrasyon</h2>
+
+            <pre><code>using Microsoft.EntityFrameworkCore;
+using RestApi.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Formatting.Elasticsearch;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
+// ========================================
+// SERILOG YAPILANDIRMASI
+// ========================================
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithMachineName()
+    .Enrich.WithProcessId()
+    .Enrich.WithThreadId()
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(
+        new Uri("http://localhost:9200"))
+    {
+        IndexFormat = $"restapi-logs-{DateTime.UtcNow:yyyy.MM.dd}",
+        AutoRegisterTemplate = true,
+        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
+        CustomFormatter = new ElasticsearchJsonFormatter(),
+        BatchPostingLimit = 50,
+        Period = TimeSpan.FromSeconds(2),
+    })
+    .CreateLogger();
+
+try
+{
+    Log.Information("Starting RestApi application");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Serilog'u host'a bağla
+    builder.Host.UseSerilog();
+
+    // ========================================
+    // OPENTELEMETRY YAPILANDIRMASI
+    // ========================================
+    var serviceName = "RestApi";
+    var serviceVersion = "1.0.0";
+
+    var resourceBuilder = ResourceBuilder.CreateDefault()
+        .AddService(serviceName: serviceName, serviceVersion: serviceVersion)
+        .AddAttributes(new Dictionary&lt;string, object&gt;
+        {
+            ["deployment.environment"] = builder.Environment.EnvironmentName
+        });
+
+    builder.Services.AddOpenTelemetry()
+        // TRACES
+        .WithTracing(tracing =&gt;
+        {
+            tracing
+                .SetResourceBuilder(resourceBuilder)
+                .AddSource("RestApi.*")
+                .AddAspNetCoreInstrumentation(options =&gt;
+                {
+                    options.Filter = (httpContext) =&gt;
+                        !httpContext.Request.Path.StartsWithSegments("/health") &amp;&amp;
+                        !httpContext.Request.Path.StartsWithSegments("/metrics");
+                })
+                .AddHttpClientInstrumentation()
+                .AddOtlpExporter(options =&gt;
+                {
+                    options.Endpoint = new Uri("http://localhost:14317");
+                });
+        })
+        // METRICS
+        .WithMetrics(metrics =&gt;
+        {
+            metrics
+                .SetResourceBuilder(resourceBuilder)
+                .AddMeter("RestApi.*")
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddPrometheusExporter();
+        });
+
+    // ========================================
+    // UYGULAMA SERVİSLERİ
+    // ========================================
+    builder.Services.AddDbContext&lt;ApplicationDbContext&gt;(options =&gt;
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddControllers();
+    builder.Services.AddSingleton&lt;RestApi.Services.PasswordManager&gt;();
+
+    // Health Checks
+    builder.Services.AddHealthChecks()
+        .AddCheck("self", () =&gt;
+            Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Application is running"));
+
+    // JWT Authentication
+    var jwtKey = builder.Configuration.GetValue&lt;string&gt;("Jwt:Key");
+    if (string.IsNullOrEmpty(jwtKey))
+        throw new InvalidOperationException("JWT Key is not configured");
+
+    var key = Encoding.ASCII.GetBytes(jwtKey);
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =&gt;
+        {
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =&gt;
+                {
+                    if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+                        context.Token = context.Request.Cookies["X-Access-Token"];
+                    return Task.CompletedTask;
+                }
+            };
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
+
+    // ========================================
+    // UYGULAMA PIPELINE
+    // ========================================
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+
+    // Serilog request logging
+    app.UseSerilogRequestLogging(options =&gt;
+    {
+        options.MessageTemplate =
+            "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    });
+
+    app.UseMiddleware&lt;GlobalMiddleware&gt;();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    // Prometheus metrics endpoint
+    app.MapPrometheusScrapingEndpoint();
+
+    // Health check endpoint
+    app.MapHealthChecks("/health");
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}</code></pre>
+        </div>
+
+        <!-- Adım 3: appsettings.json -->
+        <div class="card">
+            <h2><span class="step-number">3</span> appsettings.json G&uuml;ncelleme</h2>
+
+            <pre><code>{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=restapi.db"
+  },
+  "Jwt": {
+    "Key": "aP3rF3ctlyS3cur3K3yF0rJWTt0k3n!aP3rF3ctlyS3cur3K3yF0rJWTt0k3n!"
+  },
+  "PasswordEncryption": {
+    "_secretKey": "ywEs/1AW33HYtmVH0jwxYskVaMoK4EE4KVpTPPyv0h0="
+  },
+  "OpenTelemetry": {
+    "ServiceName": "RestApi",
+    "OtlpEndpoint": "http://localhost:14317"
+  },
+  "Elasticsearch": {
+    "Url": "http://localhost:9200"
+  }
+}</code></pre>
+        </div>
+
+        <!-- Adım 4: Prometheus Config -->
+        <div class="card">
+            <h2><span class="step-number">4</span> prometheus.yml G&uuml;ncelleme</h2>
+
+            <pre><code># prometheus.yml
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'restapi'
+    static_configs:
+      - targets: ['host.docker.internal:5000']
+    metrics_path: '/metrics'
+    scheme: 'http'</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 Not:</strong> Eğer .NET uygulaması farklı bir portta &ccedil;alışıyorsa, <span class="inline-code">targets</span> değerini g&uuml;ncelleyin. <span class="inline-code">dotnet run</span> varsayılan olarak 5000 (HTTP) ve 5001 (HTTPS) portlarını kullanır.
+            </div>
+        </div>
+
+        <!-- Adım 5: OTel Config -->
+        <div class="card">
+            <h2><span class="step-number">5</span> otel-config.yaml G&uuml;ncelleme</h2>
+
+            <pre><code># otel-config.yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]</code></pre>
+        </div>
+
+        <!-- Adım 6: Doğrulama -->
+        <div class="card">
+            <h2><span class="step-number">6</span> Entegrasyon Doğrulama Adımları</h2>
+
+            <h3>Docker Servislerini Başlatma</h3>
+            <pre><code>cd RestApi
+docker compose down      # &Ouml;nceki container'ları temizle
+docker compose up -d     # Servisleri başlat
+docker compose ps        # Durumu kontrol et</code></pre>
+
+            <h3>.NET Uygulamasını Başlatma</h3>
+            <pre><code>cd RestApi/RestApi
+dotnet restore
+dotnet run</code></pre>
+
+            <h3>Doğrulama Kontrolleri</h3>
+            <pre><code># 1. Health Check
+curl http://localhost:5000/health
+# Beklenen: Healthy
+
+# 2. Metrics Endpoint
+curl http://localhost:5000/metrics
+# Beklenen: Prometheus format metrikleri
+
+# 3. API İstekleri (trace &amp; log &uuml;retir)
+curl http://localhost:5000/api/products
+
+# 4. Prometheus Targets
+# http://localhost:9090/targets
+# restapi target'ı UP olmalı
+
+# 5. Jaeger Traces
+# http://localhost:16686
+# Service: RestApi se&ccedil;ip trace'leri g&ouml;r&uuml;nt&uuml;leyin
+
+# 6. Elasticsearch Logs
+curl "http://localhost:9200/restapi-logs-*/_search?q=*&amp;pretty&amp;size=5"
+
+# 7. Kibana
+# http://localhost:5601
+# Data view oluşturun: restapi-logs-*
+
+# 8. Grafana
+# http://localhost:3000
+# Prometheus data source ekleyin: http://prometheus:9090</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ T&uuml;m kontroller başarılı ise:</strong> T&uuml;m monitoring alt yapısı hazır! Traces → Jaeger, Metrics → Prometheus/Grafana, Logs → Elasticsearch/Kibana.
+            </div>
+        </div>
+
+        <!-- Sorun Giderme -->
+        <div class="card">
+            <h2>🔧 Sık Karşılaşılan Sorunlar ve &Ccedil;&ouml;z&uuml;mleri</h2>
+
+            <h3>Prometheus &quot;restapi&quot; target DOWN g&ouml;r&uuml;n&uuml;yor</h3>
+            <pre><code># .NET uygulamasının &ccedil;alıştığını doğrulayın
+curl http://localhost:5000/metrics
+
+# Docker'dan host erişimini test edin
+docker exec prometheus wget -qO- http://host.docker.internal:5000/metrics
+
+# Linux kullanıyorsanız docker-compose'a network_mode ekleyin
+# veya prometheus.yml'de IP adresini g&uuml;ncelleyin</code></pre>
+
+            <h3>Jaeger'da trace g&ouml;r&uuml;nm&uuml;yor</h3>
+            <pre><code># OTel Collector loglarını kontrol edin
+docker logs otel-collector
+
+# Collector'ın &ccedil;alıştığını doğrulayın
+docker compose ps otel-collector
+
+# .NET'in OTLP endpoint'ine bağlanabildiğini kontrol edin
+# Program.cs'deki endpoint: http://localhost:14317</code></pre>
+
+            <h3>Elasticsearch'te log yok</h3>
+            <pre><code># Elasticsearch'ın &ccedil;alıştığını kontrol edin
+curl http://localhost:9200/_cluster/health?pretty
+
+# Index'leri listeleyin
+curl http://localhost:9200/_cat/indices?v
+
+# Serilog konsol &ccedil;ıktısını kontrol edin
+# Hata mesajları Elasticsearch bağlantı sorununu g&ouml;sterir</code></pre>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Mod&uuml;l</h2>
+            <p>Son mod&uuml;lde <strong><a href="7-dashboard-ve-gorsellestirme-egitim.html">Dashboard &amp; G&ouml;rselleştirme Demo</a></strong> ile canlı demo yaparak eğitimi tamamlayacağız.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi &amp; Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

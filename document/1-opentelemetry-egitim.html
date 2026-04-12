@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenTelemetry Perspektifi — Performans Analizi & Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, #f57c00, #e65100);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: #f57c00; color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: #e65100;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f57c00;
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        .pillar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .pillar-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .pillar-card:hover { transform: translateY(-3px); }
+        .pillar-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .pillar-card h4 { margin-bottom: 0.5rem; color: var(--text); }
+        .pillar-card p { font-size: 0.85rem; color: var(--text-light); }
+        .pillar-traces { border-color: #f57c00; background: #fff3e0; }
+        .pillar-metrics { border-color: #1a73e8; background: #e8f0fe; }
+        .pillar-logs { border-color: #34a853; background: #e6f4ea; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔭 OpenTelemetry Perspektifi</h1>
+        <p>Modül 1 — Telemetri Standartları, Kavramlar ve .NET Core Entegrasyonu</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş & Kurulum</a>
+        <a href="1-opentelemetry-egitim.html" class="active">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus & Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch & Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik & Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard & Görselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- OpenTelemetry Nedir -->
+        <div class="card">
+            <h2>📖 OpenTelemetry Nedir?</h2>
+            <p>OpenTelemetry (OTel), <strong>Cloud Native Computing Foundation (CNCF)</strong> tarafından geliştirilen, uygulamalardan telemetri verisi (traces, metrics, logs) toplamak için kullanılan açık kaynak bir gözlemlenebilirlik (observability) framework'üdür.</p>
+
+            <div class="alert alert-info">
+                <strong>🎯 Temel Amaç:</strong> Uygulamaların performansını, davranışını ve sağlığını anlamak için standartlaştırılmış bir telemetri veri toplama yöntemi sunmaktır. Vendor-agnostic (satıcıdan bağımsız) bir çözümdür.
+            </div>
+
+            <h3>OpenTelemetry Öncesi Sorunlar</h3>
+            <ul>
+                <li>Her monitoring aracı kendi SDK'sını gerektiriyordu (Jaeger SDK, Zipkin SDK, Datadog SDK vb.)</li>
+                <li>Araç değişikliği = Kod değişikliği</li>
+                <li>Farklı veri formatları ve protokoller</li>
+                <li>Vendor lock-in (satıcıya bağımlılık)</li>
+            </ul>
+
+            <h3>OpenTelemetry ile Çözüm</h3>
+            <ul>
+                <li>Tek bir SDK ile tüm telemetri verisi toplanır</li>
+                <li>OTLP (OpenTelemetry Protocol) standart protokolü</li>
+                <li>Collector üzerinden istenen backend'e veri yönlendirmesi</li>
+                <li>Kod değişikliği yapmadan backend değiştirme imkanı</li>
+            </ul>
+        </div>
+
+        <!-- Üç Sütun -->
+        <div class="card">
+            <h2>🏛️ Observability'nin Üç Sütunu (Three Pillars)</h2>
+            <div class="pillar-grid">
+                <div class="pillar-card pillar-traces">
+                    <div class="icon">🔗</div>
+                    <h4>Traces</h4>
+                    <p>Bir isteğin (request) tüm sistem boyunca izlediği yolu gösterir. Her servis arasındaki geçişleri ve süreleri kayıt altına alır.</p>
+                </div>
+                <div class="pillar-card pillar-metrics">
+                    <div class="icon">📊</div>
+                    <h4>Metrics</h4>
+                    <p>Sayısal ölçümler: CPU kullanımı, bellek tüketimi, istek sayısı, response süresi gibi zaman serisi verileri.</p>
+                </div>
+                <div class="pillar-card pillar-logs">
+                    <div class="icon">📝</div>
+                    <h4>Logs</h4>
+                    <p>Uygulamanın ürettiği metin tabanlı olay kayıtları. Hata mesajları, bilgi logları ve debug çıktıları.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OpenTelemetry Bileşenleri -->
+        <div class="card">
+            <h2>🧩 OpenTelemetry Bileşenleri</h2>
+
+            <h3>1. API (Arayüz Tanımları)</h3>
+            <p>Telemetri verisi üretmek için kullanılan arayüzler. Kendi başına veri toplamaz, sadece sözleşme tanımlar.</p>
+
+            <h3>2. SDK (Uygulama)</h3>
+            <p>API'nin gerçek implementasyonu. Veriyi toplar, işler ve dışa aktarır.</p>
+
+            <h3>3. Instrumentation (Enstrümantasyon)</h3>
+            <p>Uygulamadaki telemetri veri toplama noktaları:</p>
+            <ul>
+                <li><strong>Otomatik (Auto-Instrumentation):</strong> ASP.NET Core, HttpClient, SQL Client gibi kütüphaneler için otomatik veri toplama</li>
+                <li><strong>Manuel:</strong> Kendi iş mantığınız için özel span ve metrik oluşturma</li>
+            </ul>
+
+            <h3>4. Collector (Toplayıcı)</h3>
+            <p>Telemetri verisini alan, işleyen ve farklı backend'lere ileten aracı bileşen:</p>
+            <pre><code>┌────────────────────────────────────────────────────────┐
+│                   OTel Collector                        │
+│                                                        │
+│  ┌──────────┐   ┌──────────────┐   ┌──────────────┐   │
+│  │ Receivers │──▶│  Processors  │──▶│  Exporters   │   │
+│  │           │   │              │   │              │   │
+│  │ • OTLP    │   │ • Batch      │   │ • Jaeger     │   │
+│  │ • Zipkin  │   │ • Filter     │   │ • Prometheus │   │
+│  │ • Prometheus│ │ • Transform  │   │ • OTLP       │   │
+│  └──────────┘   └──────────────┘   └──────────────┘   │
+└────────────────────────────────────────────────────────┘</code></pre>
+
+            <h3>5. OTLP (OpenTelemetry Protocol)</h3>
+            <p>Telemetri verisini taşımak için kullanılan standart protokol. gRPC ve HTTP/protobuf üzerinden çalışır.</p>
+        </div>
+
+        <!-- Trace Kavramları -->
+        <div class="card">
+            <h2>🔗 Trace Kavramları Detaylı</h2>
+
+            <h3>Trace</h3>
+            <p>Bir isteğin başından sonuna kadar olan tüm yolculuğu temsil eder. Birden fazla span'den oluşur.</p>
+
+            <h3>Span</h3>
+            <p>Bir trace içindeki tek bir işlem birimini temsil eder. Her span'in:</p>
+            <ul>
+                <li><strong>Name:</strong> İşlemin adı (örn: "GET /api/products")</li>
+                <li><strong>SpanContext:</strong> TraceId, SpanId, TraceFlags</li>
+                <li><strong>Parent SpanId:</strong> Üst span referansı</li>
+                <li><strong>Start/End Time:</strong> Başlangıç ve bitiş zamanı</li>
+                <li><strong>Attributes:</strong> Key-value metadata (http.method, http.status_code vb.)</li>
+                <li><strong>Events:</strong> Span süresi içinde gerçekleşen olaylar</li>
+                <li><strong>Status:</strong> OK, ERROR, UNSET</li>
+            </ul>
+
+            <pre><code>Trace (TraceId: abc123)
+│
+├── Span: "GET /api/products" (SpanId: span1, 150ms)
+│   │
+│   ├── Span: "ProductService.GetAll" (SpanId: span2, Parent: span1, 80ms)
+│   │   │
+│   │   └── Span: "SELECT * FROM Products" (SpanId: span3, Parent: span2, 45ms)
+│   │
+│   └── Span: "CacheCheck" (SpanId: span4, Parent: span1, 5ms)
+│
+└── Total Duration: 150ms</code></pre>
+        </div>
+
+        <!-- .NET Entegrasyonu -->
+        <div class="card">
+            <h2>⚙️ .NET Core'a OpenTelemetry Kurulumu</h2>
+
+            <h3>Adım 1: NuGet Paketlerini Ekleyin</h3>
+            <pre><code># Temel paketler
+dotnet add package OpenTelemetry
+dotnet add package OpenTelemetry.Extensions.Hosting
+
+# Traces için
+dotnet add package OpenTelemetry.Instrumentation.AspNetCore
+dotnet add package OpenTelemetry.Instrumentation.Http
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
+
+# Metrics için
+dotnet add package OpenTelemetry.Instrumentation.Runtime
+dotnet add package OpenTelemetry.Exporter.Prometheus.AspNetCore
+
+# Logs için
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol</code></pre>
+
+            <h3>Adım 2: Program.cs'de OpenTelemetry Yapılandırması</h3>
+            <pre><code>using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
+using System.Diagnostics;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Servis adını tanımla
+var serviceName = "RestApi";
+var serviceVersion = "1.0.0";
+
+// Resource tanımı (tüm telemetri verisine eklenir)
+var resourceBuilder = ResourceBuilder.CreateDefault()
+    .AddService(serviceName: serviceName, serviceVersion: serviceVersion);
+
+// ===== TRACES =====
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =&gt;
+    {
+        tracing
+            .SetResourceBuilder(resourceBuilder)
+            // Otomatik Instrumentation
+            .AddAspNetCoreInstrumentation(options =&gt;
+            {
+                // Health check endpoint'lerini filtrele
+                options.Filter = (httpContext) =&gt;
+                    !httpContext.Request.Path.StartsWithSegments("/health");
+            })
+            .AddHttpClientInstrumentation()
+            // OTLP Exporter (Collector'a gönder)
+            .AddOtlpExporter(options =&gt;
+            {
+                options.Endpoint = new Uri("http://localhost:14317");
+            });
+    })
+    // ===== METRICS =====
+    .WithMetrics(metrics =&gt;
+    {
+        metrics
+            .SetResourceBuilder(resourceBuilder)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation()
+            // Prometheus endpoint
+            .AddPrometheusExporter();
+    });
+
+// ===== LOGS =====
+builder.Logging.AddOpenTelemetry(logging =&gt;
+{
+    logging
+        .SetResourceBuilder(resourceBuilder)
+        .AddOtlpExporter(options =&gt;
+        {
+            options.Endpoint = new Uri("http://localhost:14317");
+        });
+});
+
+var app = builder.Build();
+
+// Prometheus metrics endpoint'i
+app.MapPrometheusScrapingEndpoint();
+
+// ... diğer middleware'ler
+app.Run();</code></pre>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Not:</strong> Yukarıdaki kod mevcut Program.cs'ye entegre edilecektir. OTel Collector <span class="inline-code">http://localhost:14317</span> port'unda dinlemektedir (docker-compose'daki port mapping: 14317:4317).
+            </div>
+        </div>
+
+        <!-- Manuel Instrumentation -->
+        <div class="card">
+            <h2>🛠️ Manuel Instrumentation (Özel Span Oluşturma)</h2>
+
+            <h3>ActivitySource ile Span Oluşturma</h3>
+            <p>.NET'te OpenTelemetry span'leri <span class="inline-code">System.Diagnostics.Activity</span> sınıfı üzerinden oluşturulur:</p>
+
+            <pre><code>using System.Diagnostics;
+
+public class ProductController : ControllerBase
+{
+    // Servis için bir ActivitySource tanımla
+    private static readonly ActivitySource ActivitySource =
+        new("RestApi.ProductController");
+
+    [HttpGet]
+    public async Task&lt;IActionResult&gt; GetProducts()
+    {
+        // Özel span başlat
+        using var activity = ActivitySource.StartActivity("GetProducts");
+
+        // Attribute ekle
+        activity?.SetTag("product.query.type", "all");
+
+        try
+        {
+            // Veritabanı sorgusu için alt span
+            using var dbActivity = ActivitySource.StartActivity("DatabaseQuery");
+            dbActivity?.SetTag("db.system", "sqlite");
+            dbActivity?.SetTag("db.statement", "SELECT * FROM Products");
+
+            var products = await _context.Products.ToListAsync();
+
+            dbActivity?.SetTag("db.result.count", products.Count);
+            activity?.SetTag("product.result.count", products.Count);
+
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            // Hata durumunda span'e hata bilgisi ekle
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            activity?.RecordException(ex);
+            throw;
+        }
+    }
+}</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 İpucu:</strong> <span class="inline-code">using</span> statement ile oluşturulan Activity, scope bittiğinde otomatik olarak sonlanır ve exporter'a gönderilir.
+            </div>
+
+            <h3>ActivitySource'u OpenTelemetry'ye Kaydetme</h3>
+            <pre><code>builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =&gt;
+    {
+        tracing
+            .AddSource("RestApi.ProductController")  // Manuel source kaydı
+            .AddAspNetCoreInstrumentation()
+            // ... diğer ayarlar
+    });</code></pre>
+        </div>
+
+        <!-- OTel Collector Konfigürasyonu -->
+        <div class="card">
+            <h2>📡 OTel Collector Konfigürasyonu</h2>
+            <p>Mevcut <span class="inline-code">otel-config.yaml</span> dosyasının açıklamalı hali:</p>
+
+            <pre><code># otel-config.yaml
+
+receivers:
+  otlp:
+    protocols:
+      grpc:          # gRPC protokolü (port 4317)
+        endpoint: 0.0.0.0:4317
+      http:          # HTTP protokolü (port 4318)
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:             # Veriyi toplu gönderim için grupla
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  debug:             # Konsola debug çıktısı
+    verbosity: detailed
+
+  otlp:              # Jaeger'a OTLP ile gönder
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:          # Trace pipeline
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp]
+
+    metrics:         # Metric pipeline (opsiyonel)
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+
+    logs:            # Log pipeline (opsiyonel)
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]</code></pre>
+        </div>
+
+        <!-- Context Propagation -->
+        <div class="card">
+            <h2>🔄 Context Propagation (Bağlam Yayılımı)</h2>
+            <p>Distributed tracing'in çalışması için trace context'inin servisler arasında taşınması gerekir.</p>
+
+            <h3>W3C Trace Context Standardı</h3>
+            <p>HTTP isteklerinde aşağıdaki header'lar otomatik eklenir:</p>
+            <pre><code># traceparent header örneği
+traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+
+# Format: version-traceId-spanId-traceFlags
+# 00      → version
+# 4bf9... → traceId (32 hex karakter)
+# 00f0... → spanId (16 hex karakter)
+# 01      → traceFlags (sampled)</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ Otomatik:</strong> ASP.NET Core ve HttpClient instrumentation'ları W3C Trace Context propagation'ını otomatik olarak yapar. Ekstra yapılandırma gerekmez.
+            </div>
+        </div>
+
+        <!-- Pratik Alıştırma -->
+        <div class="card">
+            <h2>🧪 Pratik Alıştırma</h2>
+            <ol>
+                <li>OpenTelemetry NuGet paketlerini projeye ekleyin</li>
+                <li>Program.cs'e temel OpenTelemetry yapılandırmasını ekleyin</li>
+                <li>Docker servislerini başlatın (<span class="inline-code">docker compose up -d</span>)</li>
+                <li>.NET uygulamasını çalıştırın (<span class="inline-code">dotnet run</span>)</li>
+                <li>API'ye birkaç istek gönderin:
+                    <pre><code># Product endpoint'lerine istek gönder
+curl http://localhost:5000/api/products
+curl http://localhost:5000/api/products/1
+
+# Auth endpoint'ine istek gönder
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"test123"}'</code></pre>
+                </li>
+                <li>Jaeger UI'da trace'leri görüntüleyin: <span class="inline-code">http://localhost:16686</span></li>
+                <li>Service dropdown'ından "RestApi" seçin ve trace'leri inceleyin</li>
+            </ol>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Modül</h2>
+            <p>Bir sonraki modülde <strong><a href="2-prometheus-grafana-egitim.html">Prometheus & Grafana ile Metrik Toplama ve Görselleştirme</a></strong> konusuna geçeceğiz. OpenTelemetry ile topladığımız metrikleri Prometheus'a aktarmayı ve Grafana dashboard'ları oluşturmayı öğreneceğiz.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi & Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

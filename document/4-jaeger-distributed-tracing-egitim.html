@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaeger Distributed Tracing — Performans Analizi &amp; Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --jaeger: #66d2d6;
+            --jaeger-dark: #3d8b8e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--jaeger), var(--jaeger-dark));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--jaeger-dark); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--jaeger-dark);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--jaeger);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 Jaeger Distributed Tracing</h1>
+        <p>Mod&uuml;l 4 — Dağıtık İstek İzleme, Trace Analizi ve Performans Darboğaz Tespiti</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş &amp; Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus &amp; Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch &amp; Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html" class="active">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik &amp; Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard &amp; G&ouml;rselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Jaeger Nedir -->
+        <div class="card">
+            <h2>📖 Jaeger Nedir?</h2>
+            <p>Jaeger, Uber tarafından geliştirilen ve CNCF'e bağışlanan açık kaynak bir <strong>distributed tracing</strong> platformudur. Mikroservis mimarisinde isteklerin servisler arasındaki yolculuğunu görselleştirmeye yarar.</p>
+
+            <h3>Jaeger ile Neler Yapılabilir?</h3>
+            <ul>
+                <li><strong>Performans darboğaz tespiti:</strong> Hangi servis veya işlem en fazla süre harcıyor?</li>
+                <li><strong>Hata analizi:</strong> Hangi serviste hata oluşuyor?</li>
+                <li><strong>Bağımlılık grafiği:</strong> Servisler arası iletişim haritası</li>
+                <li><strong>Latency optimizasyonu:</strong> Yavaş endpoint'lerin tespiti</li>
+                <li><strong>Root cause analysis:</strong> Sorunun kaynağını belirleme</li>
+            </ul>
+
+            <h3>Jaeger Bileşenleri</h3>
+            <pre><code>
+┌─────────────────────────────────────────────────────────────┐
+│                    Jaeger All-in-One                         │
+│                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
+│  │ Collector │  │  Storage  │  │  Query   │  │    UI      │  │
+│  │ (:14250)  │  │ (Memory)  │  │ (API)    │  │ (:16686)   │  │
+│  │ (:4317)   │  │           │  │          │  │            │  │
+│  └──────────┘  └──────────┘  └──────────┘  └────────────┘  │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Port</th>
+                        <th>Protokol</th>
+                        <th>Kullanım</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>16686</td>
+                        <td>HTTP</td>
+                        <td>Jaeger UI (Web arayüzü)</td>
+                    </tr>
+                    <tr>
+                        <td>4317</td>
+                        <td>gRPC</td>
+                        <td>OTLP gRPC alıcı (OpenTelemetry)</td>
+                    </tr>
+                    <tr>
+                        <td>14250</td>
+                        <td>gRPC</td>
+                        <td>Jaeger Collector (model.proto)</td>
+                    </tr>
+                    <tr>
+                        <td>6831</td>
+                        <td>UDP</td>
+                        <td>Jaeger Agent (compact thrift)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Veri Akışı -->
+        <div class="card">
+            <h2>🔄 Trace Veri Akışı</h2>
+            <p>OpenTelemetry SDK'dan Jaeger UI'a kadar olan veri akışı:</p>
+
+            <pre><code>
+.NET Uygulaması                    Docker Ortamı
+┌───────────────────┐         ┌──────────────────────────────────┐
+│                   │         │                                  │
+│  OpenTelemetry    │  OTLP   │  ┌──────────────┐               │
+│  SDK              │────────▶│  │ OTel         │    OTLP       │
+│                   │ gRPC    │  │ Collector    │──────────────▶ │
+│  (Traces)         │ :14317  │  │ (:4317)      │               │
+│                   │         │  └──────────────┘    ┌────────┐ │
+└───────────────────┘         │                      │ Jaeger │ │
+                              │                      │ :4317  │ │
+                              │                      │        │ │
+                              │                      │ UI:    │ │
+                              │                      │ :16686 │ │
+                              │                      └────────┘ │
+                              └──────────────────────────────────┘</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 Akış:</strong> .NET App → (OTLP/gRPC :14317) → OTel Collector → (OTLP/gRPC :4317) → Jaeger → UI (:16686)
+            </div>
+        </div>
+
+        <!-- Jaeger UI Kullanımı -->
+        <div class="card">
+            <h2>🖥️ Jaeger UI Kullanım Rehberi</h2>
+
+            <h3>UI'a Erişim</h3>
+            <p>Tarayıcıda <span class="inline-code">http://localhost:16686</span> adresini açın.</p>
+
+            <h3>Trace Arama</h3>
+            <ol>
+                <li><strong>Service</strong> dropdown'ından uygulamanızı seçin (örn: "RestApi")</li>
+                <li><strong>Operation</strong> ile belirli bir endpoint filtreleyin (örn: "GET /api/products")</li>
+                <li><strong>Tags</strong> ile özel filtre ekleyin (örn: <span class="inline-code">http.status_code=500</span>)</li>
+                <li><strong>Lookback</strong> ile zaman aralığını belirleyin</li>
+                <li><strong>Min/Max Duration</strong> ile süre bazlı filtreleme yapın</li>
+                <li><strong>Find Traces</strong> butonuna tıklayın</li>
+            </ol>
+
+            <h3>Trace Detay İnceleme</h3>
+            <p>Bir trace'e tıkladığınızda göreceğiniz bilgiler:</p>
+            <ul>
+                <li><strong>Timeline görünümü:</strong> Her span'in ne kadar süre harcadığını gösteren Gantt chart</li>
+                <li><strong>Span detayları:</strong> Tags, logs, process bilgileri</li>
+                <li><strong>Critical path:</strong> İsteğin toplam süresini belirleyen en uzun yol</li>
+                <li><strong>Span ilişkileri:</strong> Parent-child span hiyerarşisi</li>
+            </ul>
+
+            <pre><code>Jaeger Trace Görünümü Örneği:
+
+Service: RestApi
+──────────────────────────────────────────────
+▐███████████████████████████████████▌  GET /api/products  (150ms)
+  ▐████████████████████▌               ProductService.GetAll  (80ms)
+    ▐██████████████▌                     DB Query: SELECT * FROM Products  (45ms)
+  ▐██▌                                 CacheCheck  (5ms)</code></pre>
+        </div>
+
+        <!-- Trace Karşılaştırma -->
+        <div class="card">
+            <h2>📊 Trace Karşılaştırma ve Analiz</h2>
+
+            <h3>İki Trace'i Karşılaştırma</h3>
+            <p>Jaeger UI'da iki trace'i yan yana karşılaştırabilirsiniz. Bu, performans regresyonlarını tespit etmek için çok kullanışlıdır:</p>
+            <ol>
+                <li>İki trace seçin (checkbox ile)</li>
+                <li><strong>Compare</strong> butonuna tıklayın</li>
+                <li>Span süreleri arasındaki farkları inceleyin</li>
+            </ol>
+
+            <h3>DAG (Dependency Graph) Görünümü</h3>
+            <p><strong>System Architecture</strong> sekmesinde servisler arası bağımlılık grafiğini görüntüleyebilirsiniz. Bu grafik trace verilerinden otomatik oluşturulur.</p>
+
+            <h3>Performans Analizi Soruları</h3>
+            <ul>
+                <li>En yavaş endpoint hangisi? (<strong>Operation</strong> bazlı sıralama)</li>
+                <li>Veritabanı sorguları toplam sürenin yüzde kaçını kaplıyor?</li>
+                <li>Servisler arası iletişimde en fazla gecikme nerede?</li>
+                <li>Hatalı trace'lerde ortak olan span hangisi?</li>
+                <li>p95 ve p99 süreleri arasında büyük fark var mı?</li>
+            </ul>
+        </div>
+
+        <!-- Manuel Span Oluşturma -->
+        <div class="card">
+            <h2>🛠️ Zengin Trace Verisi Oluşturma</h2>
+
+            <h3>İş Mantığı Span'leri</h3>
+            <pre><code>using System.Diagnostics;
+
+public class ProductService
+{
+    private static readonly ActivitySource ActivitySource =
+        new("RestApi.ProductService");
+
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger&lt;ProductService&gt; _logger;
+
+    public ProductService(ApplicationDbContext context, ILogger&lt;ProductService&gt; logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+
+    public async Task&lt;List&lt;Product&gt;&gt; GetAllProductsAsync()
+    {
+        using var activity = ActivitySource.StartActivity("GetAllProducts");
+
+        // Validation span
+        using (var validationActivity = ActivitySource.StartActivity("ValidateRequest"))
+        {
+            validationActivity?.SetTag("validation.type", "basic");
+            // Validation logic...
+            await Task.Delay(2); // Simüle
+        }
+
+        // Cache kontrol span
+        using (var cacheActivity = ActivitySource.StartActivity("CheckCache"))
+        {
+            cacheActivity?.SetTag("cache.type", "memory");
+            cacheActivity?.SetTag("cache.hit", false);
+            // Cache miss simülasyonu
+        }
+
+        // Veritabanı sorgusu span
+        List&lt;Product&gt; products;
+        using (var dbActivity = ActivitySource.StartActivity("DatabaseQuery"))
+        {
+            dbActivity?.SetTag("db.system", "sqlite");
+            dbActivity?.SetTag("db.name", "restapi");
+            dbActivity?.SetTag("db.operation", "SELECT");
+            dbActivity?.SetTag("db.statement", "SELECT * FROM Products");
+
+            products = await _context.Products.ToListAsync();
+
+            dbActivity?.SetTag("db.result_count", products.Count);
+        }
+
+        activity?.SetTag("product.count", products.Count);
+        activity?.AddEvent(new ActivityEvent("ProductsLoaded",
+            tags: new ActivityTagsCollection
+            {
+                { "count", products.Count }
+            }));
+
+        return products;
+    }
+}</code></pre>
+
+            <h3>Hata Senaryosu Span'i</h3>
+            <pre><code>public async Task&lt;Product&gt; GetProductByIdAsync(int id)
+{
+    using var activity = ActivitySource.StartActivity("GetProductById");
+    activity?.SetTag("product.id", id);
+
+    try
+    {
+        var product = await _context.Products.FindAsync(id);
+
+        if (product == null)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, $"Product {id} not found");
+            activity?.AddEvent(new ActivityEvent("ProductNotFound",
+                tags: new ActivityTagsCollection { { "product.id", id } }));
+            throw new KeyNotFoundException($"Product with ID {id} not found");
+        }
+
+        activity?.SetStatus(ActivityStatusCode.Ok);
+        return product;
+    }
+    catch (Exception ex)
+    {
+        activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+        activity?.RecordException(ex);
+        throw;
+    }
+}</code></pre>
+        </div>
+
+        <!-- Pratik Alıştırma -->
+        <div class="card">
+            <h2>🧪 Pratik Alıştırma</h2>
+            <ol>
+                <li>Docker servislerin çalıştığını doğrulayın (<span class="inline-code">docker compose ps</span>)</li>
+                <li>.NET uygulamasını OpenTelemetry ile çalıştırın</li>
+                <li>API'ye çeşitli istekler gönderin:
+                    <pre><code># Başarılı istekler
+curl http://localhost:5000/api/products
+curl http://localhost:5000/api/products/1
+
+# Hata oluşturacak istekler
+curl http://localhost:5000/api/products/99999
+curl -X POST http://localhost:5000/api/products \
+  -H "Content-Type: application/json" \
+  -d '{}'</code></pre>
+                </li>
+                <li>Jaeger UI'da (<span class="inline-code">http://localhost:16686</span>) trace'leri inceleyin</li>
+                <li>Başarılı ve hatalı trace'leri karşılaştırın</li>
+                <li>En yavaş span'i tespit edin</li>
+                <li>System Architecture grafiğini inceleyin</li>
+            </ol>
+
+            <div class="alert alert-success">
+                <strong>🎯 Hedef:</strong> Jaeger UI'da bir hata trace'ini bulup, hatanın hangi span'de (işlemde) oluştuğunu tespit edebilmelisiniz.
+            </div>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Mod&uuml;l</h2>
+            <p>Bir sonraki mod&uuml;lde <strong><a href="5-metrik-ve-log-toplama-egitim.html">Active Monitoring vs Passive Monitoring</a></strong> konusuna ge&ccedil;eceğiz.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi &amp; Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

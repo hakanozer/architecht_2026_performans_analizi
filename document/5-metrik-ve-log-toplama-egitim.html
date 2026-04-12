@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrik &amp; Log Toplama Y&ouml;ntemleri — Performans Analizi &amp; Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --accent: #7b1fa2;
+            --accent-light: #ce93d8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--accent), #4a148c);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--accent); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-light);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .comparison-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid;
+        }
+        .comparison-card h4 { margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .comparison-card ul { padding-left: 1.5rem; }
+        .comparison-card li { margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .active-card { border-color: var(--info); background: #e8f0fe; }
+        .passive-card { border-color: var(--success); background: #e6f4ea; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📡 Metrik &amp; Log Toplama Y&ouml;ntemleri</h1>
+        <p>Mod&uuml;l 5 — Active Monitoring vs Passive Monitoring, Toplama Stratejileri</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş &amp; Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus &amp; Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch &amp; Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html" class="active">5 - Metrik &amp; Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard &amp; G&ouml;rselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Active vs Passive -->
+        <div class="card">
+            <h2>⚖️ Active Monitoring vs Passive Monitoring</h2>
+            <p>Monitoring yaklaşımları temelde iki kategoriye ayrılır. Her ikisinin de avantaj ve dezavantajları vardır ve genellikle birlikte kullanılırlar.</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-card active-card">
+                    <h4>🔵 Active Monitoring (Aktif İzleme)</h4>
+                    <p><strong>Tanım:</strong> Sisteme dışarıdan düzenli olarak istek gönderip yanıtı kontrol etme.</p>
+                    <ul>
+                        <li>Health check endpoint'lerini periyodik olarak çağırma</li>
+                        <li>Sentetik (yapay) istekler gönderme</li>
+                        <li>Ping, HTTP probing, TCP check</li>
+                        <li>Dışarıdan kullanıcı deneyimini simüle etme</li>
+                        <li>Uptime monitoring servisleri</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;"><strong>Araçlar:</strong> Prometheus Blackbox Exporter, Pingdom, UptimeRobot, Synthetic Monitoring</p>
+                </div>
+                <div class="comparison-card passive-card">
+                    <h4>🟢 Passive Monitoring (Pasif İzleme)</h4>
+                    <p><strong>Tanım:</strong> Uygulama içinden üretilen telemetri verisini toplama ve analiz etme.</p>
+                    <ul>
+                        <li>Uygulama loglarını toplama</li>
+                        <li>Metrik endpoint'lerini scrape etme</li>
+                        <li>Trace verisi toplama</li>
+                        <li>Gerçek kullanıcı trafiğinden veri toplama</li>
+                        <li>Event-driven monitoring</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;"><strong>Araçlar:</strong> Prometheus, OpenTelemetry, ELK Stack, Jaeger</p>
+                </div>
+            </div>
+
+            <h3>Karşılaştırma Tablosu</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Active Monitoring</th>
+                        <th>Passive Monitoring</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Veri Kaynağı</td>
+                        <td>Sentetik istekler</td>
+                        <td>Gerçek kullanıcı trafiği</td>
+                    </tr>
+                    <tr>
+                        <td>Sorun Tespiti</td>
+                        <td>Proaktif (sorun oluşmadan &ouml;nce)</td>
+                        <td>Reaktif (sorun oluştuktan sonra)</td>
+                    </tr>
+                    <tr>
+                        <td>Kapsam</td>
+                        <td>Belirli senaryolar</td>
+                        <td>T&uuml;m trafik</td>
+                    </tr>
+                    <tr>
+                        <td>Kaynak Kullanımı</td>
+                        <td>Ek trafik &uuml;retir</td>
+                        <td>Minimal ek y&uuml;k</td>
+                    </tr>
+                    <tr>
+                        <td>Trafik Olmadığında</td>
+                        <td>Çalışmaya devam eder</td>
+                        <td>Veri &uuml;retmez</td>
+                    </tr>
+                    <tr>
+                        <td>Kullanıcı Deneyimi</td>
+                        <td>Tahmin eder</td>
+                        <td>Ger&ccedil;ek deneyimi g&ouml;sterir</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Health Checks -->
+        <div class="card">
+            <h2>❤️ Active Monitoring: Health Checks</h2>
+
+            <h3>.NET Core Health Checks</h3>
+            <pre><code>// NuGet paketi
+// dotnet add package Microsoft.Extensions.Diagnostics.HealthChecks
+// dotnet add package AspNetCore.HealthChecks.Sqlite
+
+// Program.cs
+builder.Services.AddHealthChecks()
+    // Temel sağlık kontrolü
+    .AddCheck("self", () =&gt; HealthCheckResult.Healthy())
+    // Veritabanı kontrol&uuml;
+    .AddSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "database",
+        tags: new[] { "db", "sqlite" })
+    // &Ouml;zel health check
+    .AddCheck&lt;CustomHealthCheck&gt;("custom-check");
+
+var app = builder.Build();
+
+// Health check endpoint'leri
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = _ =&gt; true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+// Liveness probe (Kubernetes i&ccedil;in)
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check =&gt; check.Tags.Contains("live")
+});
+
+// Readiness probe
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check =&gt; check.Tags.Contains("ready")
+});</code></pre>
+
+            <h3>&Ouml;zel Health Check Oluşturma</h3>
+            <pre><code>public class CustomHealthCheck : IHealthCheck
+{
+    private readonly ApplicationDbContext _context;
+
+    public CustomHealthCheck(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task&lt;HealthCheckResult&gt; CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Veritabanı bağlantısını kontrol et
+            var canConnect = await _context.Database.CanConnectAsync(cancellationToken);
+
+            if (canConnect)
+            {
+                var productCount = await _context.Products.CountAsync(cancellationToken);
+                return HealthCheckResult.Healthy(
+                    $"Database is healthy. Product count: {productCount}",
+                    new Dictionary&lt;string, object&gt;
+                    {
+                        { "product_count", productCount },
+                        { "timestamp", DateTime.UtcNow }
+                    });
+            }
+
+            return HealthCheckResult.Unhealthy("Cannot connect to database");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy(
+                "Health check failed",
+                exception: ex);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- Metrik Toplama Stratejileri -->
+        <div class="card">
+            <h2>📊 Metrik Toplama Stratejileri</h2>
+
+            <h3>Pull Model (Çekme)</h3>
+            <p>Monitoring sistemi hedef uygulamadan metrikleri belirli aralıklarla &ccedil;eker.</p>
+            <pre><code>Pull Model:
+┌──────────────┐     HTTP GET /metrics     ┌──────────────┐
+│  Prometheus  │  ─────────────────────▶   │  .NET App    │
+│  (Scraper)   │  ◀─────────────────────   │  (/metrics)  │
+│              │     Metric Response        │              │
+└──────────────┘     (every 5s)            └──────────────┘
+
+Avantajlar:
+✅ Hedef uygulamanın monitoring sistemini bilmesine gerek yok
+✅ Merkezi kontrol (scrape aralığı, hedef y&ouml;netimi)
+✅ Health check dahili (scrape başarısız = servis down)
+
+Dezavantajlar:
+❌ Firewall/NAT arkasındaki hedeflere erişim zor
+❌ Kısa &ouml;m&uuml;rl&uuml; (ephemeral) i&scedil;ler i&ccedil;in uygun değil</code></pre>
+
+            <h3>Push Model (İtme)</h3>
+            <p>Uygulama metrikleri/logları aktif olarak monitoring sistemine g&ouml;nderir.</p>
+            <pre><code>Push Model:
+┌──────────────┐     OTLP / HTTP POST     ┌──────────────┐
+│  .NET App    │  ─────────────────────▶   │  OTel        │
+│  (Exporter)  │                           │  Collector   │
+│              │                           │              │
+└──────────────┘                           └──────────────┘
+
+Avantajlar:
+✅ Firewall dostu (outbound bağlantı yeterli)
+✅ Kısa &ouml;m&uuml;rl&uuml; işler ve batch job'lar i&ccedil;in uygun
+✅ Uygulama ne zaman isterse veri g&ouml;nderebilir
+
+Dezavantajlar:
+❌ Uygulama monitoring sistemini bilmeli
+❌ DDoS riski (aşırı veri g&ouml;nderimi)
+❌ Hedefin down olduğunu tespit etmek zor</code></pre>
+
+            <h3>Hybrid Model (Karma)</h3>
+            <pre><code>Hybrid Model (Eğitimimizdeki Yaklaşım):
+
+┌──────────────┐    Push (OTLP)    ┌──────────────┐    Push    ┌──────────────┐
+│  .NET App    │──────────────────▶│  OTel        │──────────▶│   Jaeger     │
+│              │                   │  Collector   │           │  (Traces)    │
+│              │    Pull (/metrics)│              │           └──────────────┘
+│              │◀──────────────────│              │
+└──────────────┘   Prometheus      └──────────────┘
+       │
+       │  Push (HTTP)
+       ▼
+┌──────────────┐
+│Elasticsearch │
+│  (Logs)      │
+└──────────────┘</code></pre>
+        </div>
+
+        <!-- Log Seviyeleri -->
+        <div class="card">
+            <h2>📝 Log Seviyeleri ve Kullanım Rehberi</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Seviye</th>
+                        <th>Kullanım</th>
+                        <th>&Ouml;rnek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Trace</strong></td>
+                        <td>En detaylı log. Sadece debugging sırasında.</td>
+                        <td><span class="inline-code">Entering method GetProducts with filter: all</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Debug</strong></td>
+                        <td>Geliştirme sırasında faydalı detaylar.</td>
+                        <td><span class="inline-code">Cache miss for key: products_all</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Information</strong></td>
+                        <td>Normal uygulama akışını takip etme.</td>
+                        <td><span class="inline-code">User {UserId} logged in successfully</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Warning</strong></td>
+                        <td>Beklenmeyen ama tehlikeli olmayan durumlar.</td>
+                        <td><span class="inline-code">Response time exceeded 2 seconds for /api/products</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Error</strong></td>
+                        <td>İşlem başarısız oldu ama uygulama &ccedil;alışmaya devam ediyor.</td>
+                        <td><span class="inline-code">Failed to create product: duplicate name</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Critical</strong></td>
+                        <td>Acil m&uuml;dahale gerektiren kritik hata.</td>
+                        <td><span class="inline-code">Database connection pool exhausted</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Best Practice:</strong> Production ortamında minimum <strong>Information</strong> seviyesinde loglayın. <strong>Debug</strong> ve <strong>Trace</strong> seviyeleri yalnızca geliştirme/hata ayıklama sırasında aktif edilmelidir.
+            </div>
+        </div>
+
+        <!-- Correlation -->
+        <div class="card">
+            <h2>🔗 Log-Trace Korelasyonu</h2>
+            <p>Bir isteğe ait logları ve trace'leri birbirine bağlamak i&ccedil;in <strong>TraceId</strong> ve <strong>SpanId</strong> kullanılır.</p>
+
+            <h3>OpenTelemetry ile Otomatik Korelasyon</h3>
+            <pre><code>// Serilog ile TraceId/SpanId enrichment
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.With&lt;ActivityEnricher&gt;()  // TraceId, SpanId otomatik eklenir
+    .CreateLogger();
+
+// &Ouml;zel ActivityEnricher
+public class ActivityEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var activity = Activity.Current;
+        if (activity != null)
+        {
+            logEvent.AddPropertyIfAbsent(
+                propertyFactory.CreateProperty("TraceId", activity.TraceId.ToString()));
+            logEvent.AddPropertyIfAbsent(
+                propertyFactory.CreateProperty("SpanId", activity.SpanId.ToString()));
+            logEvent.AddPropertyIfAbsent(
+                propertyFactory.CreateProperty("ParentSpanId", activity.ParentSpanId.ToString()));
+        }
+    }
+}</code></pre>
+
+            <h3>Korelasyon Kullanımı</h3>
+            <pre><code>// Kibana'da TraceId ile arama:
+// TraceId: "4bf92f3577b34da6a3ce929d0e0e4736"
+
+// Jaeger'da aynı TraceId ile trace g&ouml;r&uuml;nt&uuml;leme:
+// http://localhost:16686/trace/4bf92f3577b34da6a3ce929d0e0e4736
+
+// B&ouml;ylece:
+// 1. Kibana'da bir hata logu buldunuz
+// 2. TraceId'yi kopyaladınız
+// 3. Jaeger'da bu TraceId ile trace'i a&ccedil;tınız
+// 4. Hangi servis/işlemde hata oluştuğunu g&ouml;rd&uuml;n&uuml;z</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ Temel İlke:</strong> Her zaman log, trace ve metrik verilerinizi aynı TraceId ile ilişkilendirin. Bu, sorun analizinde &quot;tek cam&quot; (single pane of glass) deneyimi sunar.
+            </div>
+        </div>
+
+        <!-- Sampling -->
+        <div class="card">
+            <h2>🎯 Sampling (Örnekleme) Stratejileri</h2>
+            <p>Y&uuml;ksek trafikli uygulamalarda t&uuml;m trace ve log verisini toplamak maliyetli olabilir. Sampling ile veri hacmi kontrol edilir.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strateji</th>
+                        <th>Açıklama</th>
+                        <th>Kullanım Alanı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>AlwaysOn</strong></td>
+                        <td>T&uuml;m trace'leri topla</td>
+                        <td>Geliştirme, d&uuml;ş&uuml;k trafikli ortamlar</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AlwaysOff</strong></td>
+                        <td>Hi&ccedil;bir trace toplama</td>
+                        <td>Tracing devre dışı bırakma</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TraceIdRatio</strong></td>
+                        <td>Belirli y&uuml;zdeyi topla (&ouml;rn: %10)</td>
+                        <td>Production ortamları</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ParentBased</strong></td>
+                        <td>&Uuml;st span'in kararına uy</td>
+                        <td>Mikroservis zincirleri</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <pre><code>// Sampling konfigürasyonu
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =&gt;
+    {
+        tracing
+            // Development: T&uuml;m&uuml;n&uuml; topla
+            // .SetSampler(new AlwaysOnSampler())
+
+            // Production: %10 &ouml;rnekleme
+            .SetSampler(new ParentBasedSampler(
+                new TraceIdRatioBasedSampler(0.1)))  // %10
+
+            // ... di&eth;er ayarlar
+    });</code></pre>
+        </div>
+
+        <!-- Pratik -->
+        <div class="card">
+            <h2>🧪 Pratik Alıştırma</h2>
+            <ol>
+                <li>Health check endpoint'lerini .NET uygulamasına ekleyin</li>
+                <li><span class="inline-code">curl http://localhost:5000/health</span> ile sağlık durumunu kontrol edin</li>
+                <li>ActivityEnricher ile log-trace korelasyonunu test edin</li>
+                <li>Kibana'da bir hata logunun TraceId'sini bulun ve Jaeger'da trace'i a&ccedil;ın</li>
+                <li>Farklı sampling stratejilerini deneyin ve veri hacmindeki değişimi g&ouml;zlemleyin</li>
+            </ol>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Mod&uuml;l</h2>
+            <p>Bir sonraki mod&uuml;lde <strong><a href="6-uygulama-entegrasyonu-egitim.html">T&uuml;m Araçların .NET Uygulamasına Tam Entegrasyonu</a></strong> konusuna ge&ccedil;eceğiz.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi &amp; Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

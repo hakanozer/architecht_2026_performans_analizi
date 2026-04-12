@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performans Analizi & Monitoring - Giriş ve Kurulum</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--primary); color: white; }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .card h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-day { background: var(--primary); color: white; }
+        .badge-tool { background: #e8f0fe; color: var(--primary); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Performans Analizi & Monitoring</h1>
+        <p>Modül 0 — Giriş, Genel Bakış ve Kurulum Rehberi</p>
+        <p><span class="badge badge-day">3 Günlük Eğitim</span></p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html" class="active">0 - Giriş & Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus & Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch & Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik & Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard & Görselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Eğitim Genel Bakış -->
+        <div class="card">
+            <h2>🎯 Eğitim Genel Bakış</h2>
+            <p>Bu eğitim serisi, .NET Core REST API uygulamalarında performans analizi, izleme (monitoring), loglama ve metrik toplama konularını kapsamlı bir şekilde ele almaktadır.</p>
+
+            <h3>Eğitim Müfredatı</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gün</th>
+                        <th>Konu</th>
+                        <th>Araçlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-day">Gün 1</span></td>
+                        <td>Debugging & Performance Tools (Windows)</td>
+                        <td><span class="badge badge-tool">WinDbg</span> <span class="badge badge-tool">Visual Studio</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-day">Gün 2</span></td>
+                        <td>Monitoring, Logging, OpenTelemetry</td>
+                        <td><span class="badge badge-tool">OpenTelemetry</span> <span class="badge badge-tool">Prometheus</span> <span class="badge badge-tool">Jaeger</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-day">Gün 3</span></td>
+                        <td>Log Databases, Metric Visualization, Demo</td>
+                        <td><span class="badge badge-tool">Grafana</span> <span class="badge badge-tool">Elasticsearch</span> <span class="badge badge-tool">Kibana</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mac / VS Code Geçiş -->
+        <div class="card">
+            <h2>💻 Mac & VS Code Ortamına Geçiş</h2>
+            <p>İlk ders Windows üzerinde WinDbg ve Visual Studio ile yürütüldü. Bundan sonraki dersler macOS üzerinde VS Code ile devam edecektir.</p>
+
+            <h3>VS Code Eklentileri (Extensions)</h3>
+            <div class="alert alert-info">
+                <strong>💡 İpucu:</strong> VS Code Extensions panelinden (⌘+Shift+X) aşağıdaki eklentileri yükleyin.
+            </div>
+            <ul>
+                <li><strong>C# Dev Kit</strong> — .NET geliştirme ortamı</li>
+                <li><strong>.NET Install Tool</strong> — .NET SDK yönetimi</li>
+                <li><strong>REST Client</strong> — HTTP istekleri doğrudan VS Code'dan gönderme</li>
+                <li><strong>Docker</strong> — Container yönetimi</li>
+                <li><strong>YAML</strong> — docker-compose ve config dosyaları için</li>
+                <li><strong>Thunder Client</strong> — Postman alternatifi</li>
+                <li><strong>GitLens</strong> — Git geçmişi ve diff görünümü</li>
+            </ul>
+
+            <h3>macOS'ta .NET SDK Kurulumu</h3>
+            <pre><code># .NET SDK kurulumu (Homebrew ile)
+brew install dotnet-sdk
+
+# Versiyon kontrolü
+dotnet --version
+
+# Proje restore
+cd RestApi/RestApi
+dotnet restore
+
+# Projeyi çalıştırma
+dotnet run</code></pre>
+
+            <h3>Docker Desktop (Mac)</h3>
+            <pre><code># Docker Desktop yüklü olmalı
+# https://www.docker.com/products/docker-desktop/
+
+# Docker versiyon kontrolü
+docker --version
+docker compose version
+
+# Tüm servisleri başlatma
+cd RestApi
+docker compose up -d
+
+# Servislerin durumunu kontrol
+docker compose ps</code></pre>
+        </div>
+
+        <!-- Docker Servisleri -->
+        <div class="card">
+            <h2>🐳 Docker Servis Mimarisi</h2>
+            <p>Eğitim ortamında aşağıdaki Docker servisleri kullanılmaktadır:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Servis</th>
+                        <th>Port</th>
+                        <th>Amaç</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🔥 <strong>Prometheus</strong></td>
+                        <td>9090</td>
+                        <td>Metrik toplama ve sorgulama</td>
+                        <td><span class="inline-code">http://localhost:9090</span></td>
+                    </tr>
+                    <tr>
+                        <td>📊 <strong>Grafana</strong></td>
+                        <td>3000</td>
+                        <td>Dashboard ve görselleştirme</td>
+                        <td><span class="inline-code">http://localhost:3000</span></td>
+                    </tr>
+                    <tr>
+                        <td>🔍 <strong>Elasticsearch</strong></td>
+                        <td>9200</td>
+                        <td>Log veritabanı ve arama motoru</td>
+                        <td><span class="inline-code">http://localhost:9200</span></td>
+                    </tr>
+                    <tr>
+                        <td>📥 <strong>Logstash</strong></td>
+                        <td>5001</td>
+                        <td>Log toplama ve dönüştürme</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>📈 <strong>Kibana</strong></td>
+                        <td>5601</td>
+                        <td>Log görselleştirme ve analiz</td>
+                        <td><span class="inline-code">http://localhost:5601</span></td>
+                    </tr>
+                    <tr>
+                        <td>🔗 <strong>Jaeger</strong></td>
+                        <td>16686</td>
+                        <td>Distributed tracing UI</td>
+                        <td><span class="inline-code">http://localhost:16686</span></td>
+                    </tr>
+                    <tr>
+                        <td>📡 <strong>OTel Collector</strong></td>
+                        <td>14317/14318</td>
+                        <td>Telemetri veri toplama</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Önemli:</strong> Tüm servislerin düzgün başladığını <span class="inline-code">docker compose ps</span> ile kontrol edin. Elasticsearch'ün healthcheck'i tamamlanması 30-60 saniye sürebilir.
+            </div>
+        </div>
+
+        <!-- Mimari Şema -->
+        <div class="card">
+            <h2>🏗️ Eğitim Mimarisi</h2>
+            <pre><code>
+┌─────────────────────────────────────────────────────────┐
+│                    .NET Core REST API                    │
+│              (OpenTelemetry SDK Entegrasyonu)            │
+│                                                         │
+│  ┌──────────┐  ┌──────────┐  ┌────────────────────┐    │
+│  │  Traces   │  │ Metrics  │  │       Logs         │    │
+│  └─────┬─────┘  └─────┬────┘  └─────────┬──────────┘    │
+└────────┼──────────────┼────────────────────┼─────────────┘
+         │              │                    │
+         ▼              │                    ▼
+┌─────────────────┐     │         ┌───────────────────┐
+│  OTel Collector  │     │         │    Elasticsearch   │
+│  (gRPC :14317)   │     │         │     (:9200)        │
+└────────┬─────────┘     │         └─────────┬─────────┘
+         │              │                    │
+         ▼              ▼                    ▼
+┌──────────────┐  ┌──────────────┐   ┌──────────────┐
+│    Jaeger     │  │  Prometheus  │   │    Kibana     │
+│   (:16686)    │  │   (:9090)    │   │   (:5601)     │
+└──────────────┘  └───────┬──────┘   └──────────────┘
+                          │
+                          ▼
+                   ┌──────────────┐
+                   │   Grafana     │
+                   │   (:3000)     │
+                   └──────────────┘
+            </code></pre>
+        </div>
+
+        <!-- Servis Doğrulama -->
+        <div class="card">
+            <h2>✅ Kurulum Doğrulama Adımları</h2>
+
+            <h3>1. Docker Servislerini Başlatma</h3>
+            <pre><code># Proje dizinine gidin
+cd RestApi
+
+# Servisleri başlatın
+docker compose up -d
+
+# Durumu kontrol edin
+docker compose ps
+
+# Logları izleyin
+docker compose logs -f</code></pre>
+
+            <h3>2. Servis Sağlık Kontrolleri</h3>
+            <pre><code># Prometheus
+curl http://localhost:9090/-/healthy
+
+# Elasticsearch
+curl http://localhost:9200/_cluster/health?pretty
+
+# Grafana (varsayılan kullanıcı: admin/admin)
+curl http://localhost:3000/api/health
+
+# Kibana
+curl http://localhost:5601/api/status
+
+# Jaeger
+curl http://localhost:16686/</code></pre>
+
+            <h3>3. .NET Uygulamasını Başlatma</h3>
+            <pre><code>cd RestApi/RestApi
+dotnet restore
+dotnet run</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ Başarılı:</strong> Tüm servisler çalışıyorsa ve health check'ler geçiyorsa, eğitim ortamınız hazırdır!
+            </div>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>📚 Ders Sırası ve Öncelik</h2>
+            <p>Kalan dersler için önerilen sıra:</p>
+            <ol>
+                <li><strong><a href="1-opentelemetry-egitim.html">OpenTelemetry Perspektifi</a></strong> — Temel kavramlar, .NET entegrasyonu</li>
+                <li><strong><a href="2-prometheus-grafana-egitim.html">Prometheus & Grafana</a></strong> — Metrik toplama ve görselleştirme</li>
+                <li><strong><a href="3-elasticsearch-kibana-egitim.html">Elasticsearch & Kibana</a></strong> — Log veritabanı ve analiz</li>
+                <li><strong><a href="4-jaeger-distributed-tracing-egitim.html">Jaeger Distributed Tracing</a></strong> — İstek izleme ve trace analizi</li>
+                <li><strong><a href="5-metrik-ve-log-toplama-egitim.html">Active vs Passive Monitoring</a></strong> — Farklı toplama yöntemleri</li>
+                <li><strong><a href="6-uygulama-entegrasyonu-egitim.html">Uygulama Entegrasyonu</a></strong> — Tüm araçların .NET'e entegrasyonu</li>
+                <li><strong><a href="7-dashboard-ve-gorsellestirme-egitim.html">Dashboard & Görselleştirme Demo</a></strong> — Son demo ve canlı izleme</li>
+            </ol>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi & Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>
