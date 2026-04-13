@@ -1,7 +1,19 @@
+# prometheus.yml
 global:
-  scrape_interval: 5s
+  scrape_interval: 5s          # Her 5 saniyede bir metrik topla
+  evaluation_interval: 5s       # Alert kurallarını her 5 saniyede değerlendir
 
 scrape_configs:
+  # Prometheus kendi metriklerini toplar
   - job_name: 'prometheus'
     static_configs:
       - targets: ['prometheus:9090']
+
+  # .NET REST API metrikleri
+  - job_name: 'restapi'
+    # Mac'te docker dışından çalışan .NET uygulaması
+    static_configs:
+      - targets: ['host.docker.internal:5120']
+    # Metrics endpoint yolu
+    metrics_path: '/metrics'
+    scheme: 'http'

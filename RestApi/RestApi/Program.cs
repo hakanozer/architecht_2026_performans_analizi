@@ -50,7 +50,10 @@ builder.Services.AddOpenTelemetry()
             .AddHttpClientInstrumentation()
             .AddRuntimeInstrumentation()
             // Prometheus endpoint
-            .AddPrometheusExporter();
+            .AddPrometheusExporter(options =>
+            {
+                options.ScrapeEndpointPath = "/metrics";
+            });
     });
     // ===== LOGS =====
 builder.Logging.AddOpenTelemetry(logging =>
@@ -104,16 +107,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     
 var app = builder.Build();
 
-// Prometheus metrics endpoint'i
-app.MapPrometheusScrapingEndpoint();
-
-// https config
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-    app.UseHttpsRedirection();
-}
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -124,10 +117,12 @@ if (app.Environment.IsDevelopment())
 // app.UseMiddleware<GlobalExceptionHandler>();
 app.UseMiddleware<GlobalMiddleware>();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
  app.Run();
