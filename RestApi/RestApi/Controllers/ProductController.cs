@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RestApi.Data;
 using RestApi.Models;
 using System.Linq;
+using System.Diagnostics;
 
 namespace RestApi.Controllers
 {
@@ -11,6 +12,9 @@ namespace RestApi.Controllers
     [Authorize(Roles = "Product")]
     public class ProductController : ControllerBase
     {
+        // Servis için bir ActivitySource tanımla
+        private static readonly ActivitySource ActivitySource = new("RestApi.ProductController");
+
         private readonly ApplicationDbContext _context;
 
         public ProductController(ApplicationDbContext context)
@@ -56,8 +60,21 @@ namespace RestApi.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
+            // Özel span başlat
+            using var activity = ActivitySource.StartActivity("GetAll");
+            // Attribute ekle
+            activity?.SetTag("product.query.type", "all");
+
+            // Veritabanı sorgusu için alt span
+            using var dbActivity = ActivitySource.StartActivity("DatabaseQuery");
+            dbActivity?.SetTag("db.system", "sqlite");
+            dbActivity?.SetTag("db.statement", "SELECT * FROM Products");
+
             var products = _context.Products.ToList();
             Util.Util.ls.Add(products);
+
+            dbActivity?.SetTag("db.result.count", products.Count);
+            activity?.SetTag("product.result.count", products.Count);
             return Ok(products);
         }
     }
