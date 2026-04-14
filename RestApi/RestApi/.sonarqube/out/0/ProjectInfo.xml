@@ -3,15 +3,16 @@
   <ProjectName>RestApi</ProjectName>
   <ProjectLanguage>C#</ProjectLanguage>
   <ProjectType>Product</ProjectType>
-  <ProjectGuid>0141cdfa-fed0-47ff-b013-cb25e00262f0</ProjectGuid>
-  <FullPath>/Users/hakan/Documents/flo_2025_dotnet/RestApi/RestApi.csproj</FullPath>
+  <ProjectGuid>99ad5c84-47fc-4fe8-a5a2-8bc52eb64e33</ProjectGuid>
+  <FullPath>/Users/hakan/Documents/GitHub/architecht_2026_performans_analizi/RestApi/RestApi/RestApi.csproj</FullPath>
   <IsExcluded>false</IsExcluded>
-  <AnalysisResults>
-    <AnalysisResult Id="FilesToAnalyze" Location="/Users/hakan/Documents/flo_2025_dotnet/RestApi/.sonarqube/conf/0/FilesToAnalyze.txt" />
-  </AnalysisResults>
+  <AnalysisResultFiles>
+    <AnalysisResultFile Id="FilesToAnalyze" Location="/Users/hakan/Documents/GitHub/architecht_2026_performans_analizi/RestApi/RestApi/.sonarqube/conf/0/FilesToAnalyze.txt" />
+  </AnalysisResultFiles>
   <AnalysisSettings>
-    <Property Name="sonar.cs.roslyn.reportFilePaths">/Users/hakan/Documents/flo_2025_dotnet/RestApi/.sonarqube/out/0/Issues.json</Property>
-    <Property Name="sonar.cs.analyzer.projectOutPaths">/Users/hakan/Documents/flo_2025_dotnet/RestApi/.sonarqube/out/0</Property>
+    <Property Name="sonar.cs.roslyn.reportFilePaths">/Users/hakan/Documents/GitHub/architecht_2026_performans_analizi/RestApi/RestApi/.sonarqube/out/0/Issues.json</Property>
+    <Property Name="sonar.cs.analyzer.projectOutPaths">/Users/hakan/Documents/GitHub/architecht_2026_performans_analizi/RestApi/RestApi/.sonarqube/out/0</Property>
+    <Property Name="sonar.cs.scanner.telemetry">/Users/hakan/Documents/GitHub/architecht_2026_performans_analizi/RestApi/RestApi/.sonarqube/out/0/Telemetry.json</Property>
   </AnalysisSettings>
   <Configuration>Debug</Configuration>
   <Platform>AnyCPU</Platform>

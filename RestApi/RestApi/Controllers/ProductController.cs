@@ -17,9 +17,12 @@ namespace RestApi.Controllers
 
         private readonly ApplicationDbContext _context;
 
-        public ProductController(ApplicationDbContext context)
+        private readonly ILogger<ProductController> _logger;
+
+        public ProductController(ApplicationDbContext context, ILogger<ProductController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -27,6 +30,7 @@ namespace RestApi.Controllers
         {
             _context.Products.Add(product);
             _context.SaveChanges();
+            _logger.LogInformation("Product created: {@Product}", product);
             return Ok(product);
         }
 
@@ -36,11 +40,13 @@ namespace RestApi.Controllers
             var existingProduct = _context.Products.Find(id);
             if (existingProduct == null)
             {
+                _logger.LogWarning("Product not found: {ProductId}", id);
                 return NotFound();
             }
             existingProduct.Name = product.Name;
             existingProduct.Price = product.Price;
             _context.SaveChanges();
+            _logger.LogInformation("Product updated: {@Product}", existingProduct);
             return Ok(existingProduct);
         }
 
@@ -50,10 +56,12 @@ namespace RestApi.Controllers
             var product = _context.Products.Find(id);
             if (product == null)
             {
+                _logger.LogWarning("Product not found: {ProductId}", id);
                 return NotFound();
             }
             _context.Products.Remove(product);
             _context.SaveChanges();
+            _logger.LogInformation("Product deleted: {ProductId}", id);
             return Ok();
         }
 
@@ -72,6 +80,7 @@ namespace RestApi.Controllers
 
             var products = _context.Products.ToList();
             Util.Util.ls.Add(products);
+            _logger.LogInformation("Retrieved {ProductCount} products", products.Count);
 
             dbActivity?.SetTag("db.result.count", products.Count);
             activity?.SetTag("product.result.count", products.Count);

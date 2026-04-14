@@ -1,6 +1,6 @@
-projectKey=newProject
+projectKey=performans_analizi
 serverUrl=http://localhost:9000
-serverVersion=25.5.0.107428
-dashboardUrl=http://localhost:9000/dashboard?id=newProject
-ceTaskId=f42098ce-59e5-4c9c-bf05-8b3f3dfe959f
-ceTaskUrl=http://localhost:9000/api/ce/task?id=f42098ce-59e5-4c9c-bf05-8b3f3dfe959f
+serverVersion=26.4.0.121862
+dashboardUrl=http://localhost:9000/dashboard?id=performans_analizi
+ceTaskId=46cab963-f159-45cf-9f55-a43bfaab7335
+ceTaskUrl=http://localhost:9000/api/ce/task?id=46cab963-f159-45cf-9f55-a43bfaab7335

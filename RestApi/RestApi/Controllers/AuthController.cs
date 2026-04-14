@@ -16,15 +16,17 @@ namespace RestApi.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger<AuthController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly RestApi.Services.PasswordManager _passwordManager;
 
-        public AuthController(ApplicationDbContext context, IConfiguration configuration, RestApi.Services.PasswordManager passwordManager)
+        public AuthController(ApplicationDbContext context, IConfiguration configuration, RestApi.Services.PasswordManager passwordManager, ILogger<AuthController> logger)
         {
             _configuration = configuration;
             _context = context;
             _passwordManager = passwordManager;
+            _logger = logger;
         }
 
 
@@ -38,6 +40,7 @@ namespace RestApi.Controllers
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             _context.Users.Add(user);
             _context.SaveChanges();
+            _logger.LogInformation("User registered: {@User}", user);
             return Ok(user);
         }
 
@@ -105,7 +108,8 @@ namespace RestApi.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
             Response.Cookies.Append("X-Access-Token", tokenString, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddHours(ExpiresTime) });
-
+            // Log the login event userid and timestamp
+            _logger.LogInformation("User logged in: {@Username} at {LoginTime}", existingUser.Username, DateTime.UtcNow);
             return Ok(new { Token = tokenString });
         }
 
