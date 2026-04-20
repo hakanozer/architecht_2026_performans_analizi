@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performans Analizi & Monitoring - SonarQube Kod Kalitesi</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --sonar: #4e9bcd;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--primary); color: white; }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .card h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem;
+        }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-day { background: var(--primary); color: white; }
+        .badge-tool { background: #e8f0fe; color: var(--primary); }
+        .badge-sonar { background: #e1f0fa; color: var(--sonar); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .metric-item {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .metric-item .metric-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .metric-item .metric-label { font-size: 0.85rem; color: var(--text-light); }
+        .metric-item .metric-value { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 SonarQube — Kod Kalitesi ve Güvenlik Analizi</h1>
+        <p>Statik Kod Analizi, Kalite Kapıları ve Sürekli İnceleme Rehberi</p>
+        <p><span class="badge badge-day">Performans Analizi & Monitoring Eğitimi</span></p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş & Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus & Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch & Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik & Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard & Görselleştirme</a>
+        <a href="sonarqube-egitim.html" class="active">SonarQube</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- SonarQube Nedir? -->
+        <div class="card">
+            <h2>🎯 SonarQube Nedir?</h2>
+            <p>SonarQube, yazılım projelerinde <strong>statik kod analizi</strong> yaparak kod kalitesini ölçen, güvenlik açıklarını tespit eden ve teknik borcu yöneten açık kaynaklı bir sürekli inceleme (Continuous Inspection) platformudur.</p>
+
+            <h3>Temel Özellikler</h3>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-icon">🐛</div>
+                    <div class="metric-label">Bugs (Hatalar)</div>
+                    <div class="metric-value">Kod Hataları</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">🔓</div>
+                    <div class="metric-label">Vulnerabilities</div>
+                    <div class="metric-value">Güvenlik Açıkları</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">🧹</div>
+                    <div class="metric-label">Code Smells</div>
+                    <div class="metric-value">Kötü Kokular</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-label">Coverage</div>
+                    <div class="metric-value">Test Kapsamı</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-label">Duplications</div>
+                    <div class="metric-value">Tekrar Eden Kod</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">🏗️</div>
+                    <div class="metric-label">Technical Debt</div>
+                    <div class="metric-value">Teknik Borç</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>💡 Bilgi:</strong> SonarQube, 30'dan fazla programlama dilini destekler. Bu eğitimde C# / .NET projemiz üzerinde kullanılacaktır.
+            </div>
+        </div>
+
+        <!-- Mimari ve Bileşenler -->
+        <div class="card">
+            <h2>🏛️ SonarQube Mimarisi</h2>
+            <p>SonarQube üç temel bileşenden oluşur:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bileşen</th>
+                        <th>Açıklama</th>
+                        <th>Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-sonar">SonarQube Server</span></td>
+                        <td>Web arayüzü, kural motoru, analiz sonuçlarının depolanması ve görselleştirilmesi</td>
+                        <td><code class="inline-code">9000</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-sonar">PostgreSQL DB</span></td>
+                        <td>Analiz sonuçları, proje yapılandırmaları ve kalite profilleri için veritabanı</td>
+                        <td><code class="inline-code">5432</code></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-sonar">SonarScanner</span></td>
+                        <td>Kaynak kodu analiz eden istemci tarafı araç (.NET için <code class="inline-code">dotnet-sonarscanner</code>)</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Analiz Akışı</h3>
+<pre><code>┌──────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  Kaynak Kod  │────▶│  SonarScanner     │────▶│  SonarQube       │
+│  (.NET)      │     │  (dotnet-sonar)   │     │  Server (:9000)  │
+└──────────────┘     └──────────────────┘     └────────┬─────────┘
+                                                       │
+                                                       ▼
+                                              ┌──────────────────┐
+                                              │  PostgreSQL DB   │
+                                              │  (sonarqube_db)  │
+                                              └──────────────────┘</code></pre>
+        </div>
+
+        <!-- Docker Compose Kurulumu -->
+        <div class="card">
+            <h2>🐳 Docker Compose ile Kurulum</h2>
+            <p>Projemizdeki <code class="inline-code">docker-compose.yml</code> dosyasında SonarQube aşağıdaki şekilde yapılandırılmıştır:</p>
+
+<pre><code># docker-compose.yml — SonarQube Servisleri
+
+# ✅ SONARQUBE
+sonarqube:
+  image: sonarqube:community
+  container_name: sonarqube
+  depends_on:
+    - sonarqube_db
+  ports:
+    - "9000:9000"
+  environment:
+    SONAR_JDBC_URL: jdbc:postgresql://sonarqube_db:5432/sonar
+    SONAR_JDBC_USERNAME: sonar
+    SONAR_JDBC_PASSWORD: sonar
+  volumes:
+    - sonarqube_data:/opt/sonarqube/data
+    - sonarqube_logs:/opt/sonarqube/logs
+    - sonarqube_extensions:/opt/sonarqube/extensions
+  restart: unless-stopped
+
+# ✅ SONAR DB
+sonarqube_db:
+  image: postgres:13
+  container_name: sonarqube_db
+  environment:
+    POSTGRES_USER: sonar
+    POSTGRES_PASSWORD: sonar
+    POSTGRES_DB: sonar
+  volumes:
+    - sonarqube_postgres:/var/lib/postgresql/data
+  restart: unless-stopped
+
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  sonarqube_postgres:</code></pre>
+
+            <h3><span class="step-number">1</span> Servisleri Başlatma</h3>
+<pre><code># Tüm servisleri başlat
+docker-compose up -d sonarqube sonarqube_db
+
+# Logları kontrol et
+docker-compose logs -f sonarqube
+
+# Servis durumunu kontrol et
+docker-compose ps</code></pre>
+
+            <h3><span class="step-number">2</span> İlk Erişim</h3>
+            <div class="alert alert-warning">
+                <strong>⚠️ Önemli:</strong> SonarQube'un tamamen başlaması 1-2 dakika sürebilir. Tarayıcıdan <code class="inline-code">http://localhost:9000</code> adresine gidin. Varsayılan giriş bilgileri:
+                <br><strong>Kullanıcı adı:</strong> <code class="inline-code">admin</code> | <strong>Şifre:</strong> <code class="inline-code">admin</code>
+                <br>İlk girişte şifre değişikliği istenecektir.
+            </div>
+        </div>
+
+        <!-- SonarScanner .NET Kurulumu -->
+        <div class="card">
+            <h2>⚙️ .NET SonarScanner Kurulumu</h2>
+            <p>.NET projelerini analiz etmek için <code class="inline-code">dotnet-sonarscanner</code> global aracını kullanıyoruz.</p>
+
+            <h3><span class="step-number">1</span> SonarScanner Kurulumu</h3>
+<pre><code># Global tool olarak yükleme
+dotnet tool install --global dotnet-sonarscanner
+
+# Kurulumu doğrulama
+dotnet sonarscanner --version</code></pre>
+
+            <h3><span class="step-number">2</span> SonarQube'da Proje Oluşturma</h3>
+            <ol>
+                <li><code class="inline-code">http://localhost:9000</code> adresine gidin</li>
+                <li><strong>Projects → Create Project → Manually</strong> seçin</li>
+                <li><strong>Project Key:</strong> <code class="inline-code">restapi</code> girin</li>
+                <li><strong>Display Name:</strong> <code class="inline-code">RestApi</code> girin</li>
+                <li><strong>Set Up</strong> butonuna tıklayın</li>
+                <li><strong>Locally</strong> seçeneğini seçin</li>
+                <li>Bir <strong>Token</strong> oluşturun ve kaydedin</li>
+            </ol>
+
+            <h3><span class="step-number">3</span> Analiz Komutları</h3>
+<pre><code># Adım 1: Analizi başlat
+dotnet sonarscanner begin \
+  /k:"restapi" \
+  /d:sonar.host.url="http://localhost:9000" \
+  /d:sonar.token="BURAYA_TOKEN_YAZIN"
+
+# Adım 2: Projeyi derle
+dotnet build RestApi.sln
+
+# Adım 3: Analizi tamamla ve sonuçları gönder
+dotnet sonarscanner end \
+  /d:sonar.token="BURAYA_TOKEN_YAZIN"</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ İpucu:</strong> Analiz tamamlandıktan sonra sonuçları <code class="inline-code">http://localhost:9000/dashboard?id=restapi</code> adresinde görebilirsiniz.
+            </div>
+        </div>
+
+        <!-- Kalite Kapıları (Quality Gates) -->
+        <div class="card">
+            <h2>🚦 Kalite Kapıları (Quality Gates)</h2>
+            <p>Quality Gate, projenin belirli kalite standartlarını karşılayıp karşılamadığını kontrol eden otomatik bir eşik mekanizmasıdır. Varsayılan olarak <strong>"Sonar way"</strong> kalite kapısı aktiftir.</p>
+
+            <h3>Varsayılan Sonar Way Koşulları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metrik</th>
+                        <th>Koşul</th>
+                        <th>Eşik Değer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Yeni Kod — Güvenlik Açıkları</td>
+                        <td>Daha az olmalı</td>
+                        <td><code class="inline-code">0</code></td>
+                    </tr>
+                    <tr>
+                        <td>Yeni Kod — Hatalar (Bugs)</td>
+                        <td>Daha az olmalı</td>
+                        <td><code class="inline-code">0</code></td>
+                    </tr>
+                    <tr>
+                        <td>Yeni Kod — Code Smells (Oranı)</td>
+                        <td>A olmalı</td>
+                        <td><code class="inline-code">A (≤5%)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Yeni Kod — Kapsam (Coverage)</td>
+                        <td>Daha büyük olmalı</td>
+                        <td><code class="inline-code">≥80%</code></td>
+                    </tr>
+                    <tr>
+                        <td>Yeni Kod — Tekrarlanan Satırlar</td>
+                        <td>Daha az olmalı</td>
+                        <td><code class="inline-code">≤3%</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Özel Quality Gate Oluşturma</h3>
+            <ol>
+                <li><strong>Quality Gates</strong> menüsüne gidin</li>
+                <li><strong>Create</strong> butonuna tıklayın</li>
+                <li>İsim verin: örn. <code class="inline-code">Architecht Quality Gate</code></li>
+                <li><strong>Add Condition</strong> ile özel koşullar ekleyin</li>
+                <li>Projenize atayın</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <strong>💡 Quality Gate Durumları:</strong>
+                <br>🟢 <strong>Passed</strong> — Tüm koşullar sağlandı
+                <br>🔴 <strong>Failed</strong> — En az bir koşul sağlanamadı
+            </div>
+        </div>
+
+        <!-- Kural Profilleri -->
+        <div class="card">
+            <h2>📏 Kural Profilleri (Quality Profiles)</h2>
+            <p>Quality Profile, projenize uygulanacak analiz kurallarının koleksiyonudur. Her dil için ayrı profil tanımlanır.</p>
+
+            <h3>C# İçin Varsayılan Kurallar</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kural Kategorisi</th>
+                        <th>Açıklama</th>
+                        <th>Örnek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-tool">Bug</span></td>
+                        <td>Çalışma zamanında hata oluşturabilecek kodlar</td>
+                        <td>Null referans kontrolü eksik</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-tool">Vulnerability</span></td>
+                        <td>Güvenlik açığı oluşturabilecek kodlar</td>
+                        <td>SQL Injection riski, hardcoded şifreler</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-tool">Code Smell</span></td>
+                        <td>Bakımı zorlaştıran, temiz kod ilkelerine uymayan kodlar</td>
+                        <td>Fazla uzun metotlar, kullanılmayan değişkenler</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-tool">Security Hotspot</span></td>
+                        <td>Güvenlik açısından incelenmesi gereken kodlar</td>
+                        <td>Kriptografi kullanımı, CORS yapılandırması</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Profil Özelleştirme</h3>
+<pre><code># SonarQube Web Arayüzünden:
+# Quality Profiles → C# → Sonar way → Copy
+
+# Özel profilde kural etkinleştirme/devre dışı bırakma:
+# 1. Rules menüsünde kural arayın
+# 2. Activate/Deactivate butonunu kullanın
+# 3. Severity (önem derecesi) ayarlayın:
+#    - Blocker  → Kesinlikle düzeltilmeli
+#    - Critical → Kritik öncelikli
+#    - Major    → Yüksek öncelikli
+#    - Minor    → Düşük öncelikli
+#    - Info     → Bilgilendirme</code></pre>
+        </div>
+
+        <!-- Proje Analiz Sonuçları -->
+        <div class="card">
+            <h2>📊 Analiz Sonuçlarını Anlama</h2>
+            <p>SonarQube analiz sonuçlarınızı aşağıdaki ana kategorilerde sunar:</p>
+
+            <h3>Dashboard Metrikleri</h3>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-icon">🐛</div>
+                    <div class="metric-label">Bugs</div>
+                    <div class="metric-value">Reliability</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">🔓</div>
+                    <div class="metric-label">Vulnerabilities</div>
+                    <div class="metric-value">Security</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">🔥</div>
+                    <div class="metric-label">Hotspots</div>
+                    <div class="metric-value">Security Review</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-label">Debt</div>
+                    <div class="metric-value">Maintainability</div>
+                </div>
+            </div>
+
+            <h3>Derecelendirme Sistemi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Derece</th>
+                        <th>Reliability (Bugs)</th>
+                        <th>Security (Vulnerabilities)</th>
+                        <th>Maintainability (Debt Ratio)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: var(--success);">A</strong></td>
+                        <td>0 Bug</td>
+                        <td>0 Vulnerability</td>
+                        <td>≤ 5%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #8bc34a;">B</strong></td>
+                        <td>En az 1 Minor Bug</td>
+                        <td>En az 1 Minor Vulnerability</td>
+                        <td>6% — 10%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--warning);">C</strong></td>
+                        <td>En az 1 Major Bug</td>
+                        <td>En az 1 Major Vulnerability</td>
+                        <td>11% — 20%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #ff9800;">D</strong></td>
+                        <td>En az 1 Critical Bug</td>
+                        <td>En az 1 Critical Vulnerability</td>
+                        <td>21% — 50%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--danger);">E</strong></td>
+                        <td>En az 1 Blocker Bug</td>
+                        <td>En az 1 Blocker Vulnerability</td>
+                        <td>> 50%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Projemiz Üzerinde SonarQube -->
+        <div class="card">
+            <h2>🛠️ RestApi Projesi Üzerinde Analiz</h2>
+            <p>Mevcut <code class="inline-code">RestApi</code> projemiz üzerinde SonarQube analizi yapıldığında aşağıdaki türde bulgular elde edilmektedir:</p>
+
+            <h3>Örnek Bulgular (CS8618 — Null Atanamaz Özellik)</h3>
+<pre><code>// ⚠️ SonarQube Bulgusu: CS8618
+// Dosya: Data/ApplicationDbContext.cs
+
+// SORUN: Null atanamaz özellik, oluşturucudan çıkış yaparken
+// null olmayan bir değer içermelidir.
+public class ApplicationDbContext : DbContext
+{
+    // ❌ Bu özellikler null olabilir uyarısı verir
+    public DbSet&lt;User&gt; Users { get; set; }
+    public DbSet&lt;Product&gt; Products { get; set; }
+    public DbSet&lt;Note&gt; Notes { get; set; }
+
+    // ✅ Düzeltme seçenekleri:
+    // Seçenek 1: = null! ile başlatma
+    public DbSet&lt;User&gt; Users { get; set; } = null!;
+
+    // Seçenek 2: Nullable yapma
+    public DbSet&lt;User&gt;? Users { get; set; }
+
+    // Seçenek 3: Constructor'da başlatma
+    public ApplicationDbContext(DbContextOptions options) : base(options)
+    {
+        Users = Set&lt;User&gt;();
+    }
+}</code></pre>
+
+            <h3>Güvenlik Analizi — Kontrol Edilmesi Gerekenler</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dosya</th>
+                        <th>Konu</th>
+                        <th>Öneri</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline-code">AuthController.cs</code></td>
+                        <td>JWT Token yönetimi</td>
+                        <td>Token süresini ve secret key yönetimini kontrol edin</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">PasswordManager.cs</code></td>
+                        <td>Şifre hashleme</td>
+                        <td>Güvenli hashing algoritması kullanıldığını doğrulayın</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">Program.cs</code></td>
+                        <td>CORS ve Middleware yapılandırması</td>
+                        <td>Üretim ortamı için CORS politikasını kısıtlayın</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">appsettings.json</code></td>
+                        <td>Hassas bilgi yönetimi</td>
+                        <td>Connection string ve secret'ları environment variable ile yönetin</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-danger">
+                <strong>🔴 Dikkat:</strong> SonarQube, <code class="inline-code">appsettings.json</code> dosyasındaki hardcoded değerleri güvenlik açığı olarak işaretleyebilir. Üretim ortamında bu değerleri environment variable veya Azure Key Vault gibi bir secret yönetim aracı ile yönetin.
+            </div>
+        </div>
+
+        <!-- CI/CD Entegrasyonu -->
+        <div class="card">
+            <h2>🔄 CI/CD Pipeline Entegrasyonu</h2>
+            <p>SonarQube analizi CI/CD pipeline'ına entegre edilerek her commit veya pull request için otomatik kalite kontrolü sağlanabilir.</p>
+
+            <h3>GitHub Actions Entegrasyonu</h3>
+<pre><code># .github/workflows/sonarqube.yml
+name: SonarQube Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Begin Analysis
+        run: |
+          dotnet sonarscanner begin \
+            /k:"restapi" \
+            /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      - name: Build
+        run: dotnet build RestApi/RestApi.sln --no-incremental
+
+      - name: End Analysis
+        run: |
+          dotnet sonarscanner end \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 İpucu:</strong> GitHub Secrets içine <code class="inline-code">SONAR_HOST_URL</code> ve <code class="inline-code">SONAR_TOKEN</code> değerlerini ekleyin. Lokal geliştirme için <code class="inline-code">http://localhost:9000</code> kullanabilirsiniz.
+            </div>
+        </div>
+
+        <!-- SonarLint IDE Entegrasyonu -->
+        <div class="card">
+            <h2>💻 SonarLint — IDE Entegrasyonu</h2>
+            <p>SonarLint, SonarQube kurallarını doğrudan IDE'nizde çalıştıran bir eklentidir. Kodu yazarken anında geri bildirim sağlar.</p>
+
+            <h3>VS Code İçin Kurulum</h3>
+            <ol>
+                <li>VS Code Extensions panelinden <strong>SonarLint</strong> aratın</li>
+                <li><strong>SonarLint (by Sonarsource)</strong> eklentisini yükleyin</li>
+                <li>VS Code ayarlarında Connected Mode yapılandırın:</li>
+            </ol>
+<pre><code>// .vscode/settings.json
+{
+    "sonarlint.connectedMode.connections.sonarqube": [
+        {
+            "connectionId": "local-sonarqube",
+            "serverUrl": "http://localhost:9000",
+            "token": "BURAYA_TOKEN_YAZIN"
+        }
+    ],
+    "sonarlint.connectedMode.project": {
+        "connectionId": "local-sonarqube",
+        "projectKey": "restapi"
+    }
+}</code></pre>
+
+            <h3>Visual Studio İçin Kurulum</h3>
+            <ol>
+                <li><strong>Extensions → Manage Extensions</strong> menüsüne gidin</li>
+                <li><strong>SonarLint for Visual Studio</strong> aratın ve yükleyin</li>
+                <li><strong>Analyze → Manage SonarQube Connections</strong> üzerinden bağlantı kurun</li>
+                <li>Proje binding yaparak kuralları senkronize edin</li>
+            </ol>
+
+            <div class="alert alert-success">
+                <strong>✅ Avantaj:</strong> SonarLint ile kodunuzu SonarQube sunucusuna göndermeden önce yerel ortamınızda analiz edebilir, sorunları erkenden tespit edebilirsiniz. Bu yaklaşım <strong>"Shift Left"</strong> prensibini uygular.
+            </div>
+        </div>
+
+        <!-- Sık Karşılaşılan Kurallar -->
+        <div class="card">
+            <h2>📋 C# İçin Sık Karşılaşılan SonarQube Kuralları</h2>
+
+            <h3>🐛 Bug Kuralları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kural</th>
+                        <th>Açıklama</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline-code">S1244</code></td>
+                        <td>Floating-point değerlerde equality kontrolü yapılmamalı</td>
+                        <td>Major</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S2259</code></td>
+                        <td>Null pointer dereference — null olabilecek nesneye erişim</td>
+                        <td>Major</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S3903</code></td>
+                        <td>Tiplerin tanımlı namespace içinde olması gerekir</td>
+                        <td>Major</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🔓 Vulnerability Kuralları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kural</th>
+                        <th>Açıklama</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline-code">S2077</code></td>
+                        <td>SQL sorguları parametrize edilmeli (SQL Injection)</td>
+                        <td>Blocker</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S2092</code></td>
+                        <td>Cookie'lerde "Secure" bayrağı ayarlanmalı</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S5443</code></td>
+                        <td>Hassas bilgilere yönelik sabit kodlanmış URI'ler</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S6781</code></td>
+                        <td>JWT signing key yeterince güçlü olmalı</td>
+                        <td>Critical</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🧹 Code Smell Kuralları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kural</th>
+                        <th>Açıklama</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline-code">S1481</code></td>
+                        <td>Kullanılmayan lokal değişkenler kaldırılmalı</td>
+                        <td>Minor</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S1118</code></td>
+                        <td>Utility sınıfları instantiate edilemez olmalı</td>
+                        <td>Major</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S3776</code></td>
+                        <td>Cognitive Complexity çok yüksek — metot sadeleştirilmeli</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline-code">S1135</code></td>
+                        <td>TODO yorumları takip edilmeli</td>
+                        <td>Info</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Uygulamalı Egzersiz -->
+        <div class="card">
+            <h2>🧪 Uygulamalı Egzersizler</h2>
+
+            <h3>Egzersiz 1: İlk SonarQube Analizi</h3>
+            <ol>
+                <li>Docker Compose ile SonarQube ve PostgreSQL servislerini başlatın</li>
+                <li>SonarQube web arayüzüne giriş yapın (<code class="inline-code">http://localhost:9000</code>)</li>
+                <li>Yeni bir proje oluşturun (Project Key: <code class="inline-code">restapi</code>)</li>
+                <li>Token oluşturun</li>
+                <li><code class="inline-code">dotnet-sonarscanner</code> ile analiz çalıştırın</li>
+                <li>Dashboard'daki sonuçları inceleyin</li>
+            </ol>
+
+            <h3>Egzersiz 2: Bulguları Düzeltme</h3>
+            <ol>
+                <li>SonarQube dashboard'da bulunan <strong>Bugs</strong> sekmesine gidin</li>
+                <li>En az 2 bulguyu düzeltin</li>
+                <li>Analizi tekrar çalıştırın</li>
+                <li>Düzeltmelerin sonuçlara yansıdığını doğrulayın</li>
+            </ol>
+
+            <h3>Egzersiz 3: Özel Quality Gate</h3>
+            <ol>
+                <li>Yeni bir Quality Gate oluşturun: <code class="inline-code">Architecht QG</code></li>
+                <li>Aşağıdaki koşulları ekleyin:
+                    <ul>
+                        <li>Yeni kod coverage ≥ 70%</li>
+                        <li>Yeni Bug sayısı = 0</li>
+                        <li>Yeni Vulnerability sayısı = 0</li>
+                        <li>Tekrarlanan satır oranı ≤ 5%</li>
+                    </ul>
+                </li>
+                <li>Quality Gate'i projenize atayın</li>
+                <li>Analizi tekrar çalıştırarak Quality Gate durumunu kontrol edin</li>
+            </ol>
+
+            <h3>Egzersiz 4: SonarLint Entegrasyonu</h3>
+            <ol>
+                <li>VS Code veya Visual Studio'ya SonarLint eklentisini yükleyin</li>
+                <li>Connected Mode ile SonarQube sunucunuza bağlanın</li>
+                <li>Bir dosyayı açın ve SonarLint uyarılarını inceleyin</li>
+                <li>Uyarıları düzeltin ve SonarLint geri bildirimini gözlemleyin</li>
+            </ol>
+        </div>
+
+        <!-- En İyi Uygulamalar -->
+        <div class="card">
+            <h2>✅ En İyi Uygulamalar (Best Practices)</h2>
+
+            <h3>Genel Öneriler</h3>
+            <ul>
+                <li><strong>Clean as You Code:</strong> Yeni kod her zaman kalite standartlarına uygun olmalıdır. Mevcut teknik borcu aşamalı olarak azaltın.</li>
+                <li><strong>Quality Gate Zorunlu Kılın:</strong> CI/CD pipeline'ında Quality Gate başarısız olursa merge işlemi engellenmelidir.</li>
+                <li><strong>SonarLint Kullanın:</strong> IDE'de anlık geri bildirim alarak sorunları erkenden tespit edin.</li>
+                <li><strong>Kuralları Özelleştirin:</strong> Projenize uygun olmayan kuralları devre dışı bırakın, önemli kuralların severity'sini artırın.</li>
+                <li><strong>Düzenli Analiz:</strong> Her commit'te otomatik analiz çalıştırın.</li>
+            </ul>
+
+            <h3>Güvenlik Önerileri</h3>
+            <ul>
+                <li>SonarQube token'larını <strong>environment variable</strong> olarak saklayın, kaynak koda eklemeyin</li>
+                <li><strong>Security Hotspot</strong>'ları mutlaka inceleyin ve "Safe" veya "Fixed" olarak işaretleyin</li>
+                <li>Üretim ortamında SonarQube'a erişimi <strong>yetkilendirme</strong> ile kısıtlayın</li>
+                <li><strong>OWASP Top 10</strong> kurallarını aktif tutun</li>
+            </ul>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Hatırlatma:</strong> SonarQube, tüm güvenlik sorunlarını yakalayamaz. Statik analiz, dinamik test (DAST) ve penetrasyon testleri ile birlikte kullanılmalıdır. Bu, <strong>"Defense in Depth"</strong> (derinlemesine savunma) stratejisinin bir parçasıdır.
+            </div>
+        </div>
+
+        <!-- Sorun Giderme -->
+        <div class="card">
+            <h2>🔧 Sorun Giderme (Troubleshooting)</h2>
+
+            <h3>Sık Karşılaşılan Sorunlar</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sorun</th>
+                        <th>Çözüm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SonarQube başlamıyor</td>
+                        <td>
+                            <code class="inline-code">vm.max_map_count</code> değerini artırın:<br>
+                            <code class="inline-code">sysctl -w vm.max_map_count=524288</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Analiz bağlantı hatası veriyor</td>
+                        <td>
+                            SonarQube'un tamamen başladığından emin olun. Logları kontrol edin:<br>
+                            <code class="inline-code">docker-compose logs sonarqube</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Token geçersiz hatası</td>
+                        <td>
+                            SonarQube arayüzünden yeni token oluşturun:<br>
+                            <strong>My Account → Security → Generate Tokens</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Analiz sonuçları görünmüyor</td>
+                        <td>
+                            <code class="inline-code">dotnet sonarscanner end</code> komutunun başarıyla tamamlandığından emin olun. Background task durumunu kontrol edin:<br>
+                            <strong>Administration → Background Tasks</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL bağlantı hatası</td>
+                        <td>
+                            <code class="inline-code">sonarqube_db</code> servisinin çalıştığından emin olun:<br>
+                            <code class="inline-code">docker-compose ps sonarqube_db</code>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Faydalı Linkler -->
+        <div class="card">
+            <h2>🔗 Faydalı Kaynaklar</h2>
+            <ul>
+                <li><a href="https://docs.sonarqube.org/latest/" target="_blank">SonarQube Resmi Dokümantasyon</a></li>
+                <li><a href="https://rules.sonarsource.com/csharp" target="_blank">C# Kural Listesi (SonarSource)</a></li>
+                <li><a href="https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner-for-dotnet/" target="_blank">.NET SonarScanner Dokümantasyon</a></li>
+                <li><a href="https://www.sonarlint.org/" target="_blank">SonarLint — IDE Eklentisi</a></li>
+                <li><a href="https://docs.sonarqube.org/latest/instance-administration/quality-gates/" target="_blank">Quality Gates Rehberi</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>📊 Performans Analizi & Monitoring Eğitimi — SonarQube Modülü</p>
+        <p>Architecht Bilişim — 2026</p>
+    </div>
+</body>
+</html>
