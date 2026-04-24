@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prometheus & Grafana — Performans Analizi & Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --prometheus: #e6522c;
+            --grafana: #f46800;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--prometheus), var(--grafana));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--prometheus); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--prometheus);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--prometheus);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .two-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔥 Prometheus & 📊 Grafana</h1>
+        <p>Modül 2 — Metrik Toplama, Sorgulama ve Dashboard Görselleştirme</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş & Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html" class="active">2 - Prometheus & Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch & Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik & Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard & Görselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Prometheus Nedir -->
+        <div class="card">
+            <h2>🔥 Prometheus Nedir?</h2>
+            <p>Prometheus, açık kaynak bir <strong>zaman serisi veritabanı</strong> ve monitoring sistemidir. Metrikleri <strong>pull modeli</strong> ile hedef uygulamalardan toplar ve güçlü bir sorgulama dili (PromQL) sunar.</p>
+
+            <h3>Temel Özellikler</h3>
+            <ul>
+                <li><strong>Pull-based model:</strong> Prometheus hedef uygulamaların <span class="inline-code">/metrics</span> endpoint'ini belirli aralıklarla çeker</li>
+                <li><strong>PromQL:</strong> Güçlü ve esnek sorgulama dili</li>
+                <li><strong>Multi-dimensional data:</strong> Label tabanlı metrik modeli</li>
+                <li><strong>Service discovery:</strong> Otomatik hedef keşfi</li>
+                <li><strong>Alerting:</strong> AlertManager ile entegre uyarı sistemi</li>
+            </ul>
+
+            <pre><code>┌──────────────────────────────────────────────────────┐
+│                    Prometheus                         │
+│                                                      │
+│  ┌─────────────┐    ┌─────────┐    ┌──────────────┐  │
+│  │ Scrape Jobs │───▶│  TSDB   │◀───│   PromQL     │  │
+│  │ (Pull)      │    │(Storage)│    │  (Query)     │  │
+│  └──────┬──────┘    └─────────┘    └──────────────┘  │
+│         │                                │            │
+└─────────┼────────────────────────────────┼────────────┘
+          │                                │
+          ▼                                ▼
+   ┌──────────────┐                ┌──────────────┐
+   │ .NET App     │                │   Grafana    │
+   │ /metrics     │                │  Dashboard   │
+   └──────────────┘                └──────────────┘</code></pre>
+        </div>
+
+        <!-- Metrik Tipleri -->
+        <div class="card">
+            <h2>📏 Prometheus Metrik Tipleri</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tip</th>
+                        <th>Açıklama</th>
+                        <th>Kullanım Alanı</th>
+                        <th>Örnek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Counter</strong></td>
+                        <td>Sadece artan sayaç</td>
+                        <td>Toplam istek sayısı, hata sayısı</td>
+                        <td><span class="inline-code">http_requests_total</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gauge</strong></td>
+                        <td>Artıp azalan değer</td>
+                        <td>Sıcaklık, bellek kullanımı, aktif bağlantı sayısı</td>
+                        <td><span class="inline-code">process_memory_bytes</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Histogram</strong></td>
+                        <td>Dağılım ölçümü (bucket'lar)</td>
+                        <td>Response süresi dağılımı, boyut dağılımı</td>
+                        <td><span class="inline-code">http_request_duration_seconds</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Summary</strong></td>
+                        <td>İstemci tarafı quantile hesaplaması</td>
+                        <td>Percentile hesaplamaları (p50, p95, p99)</td>
+                        <td><span class="inline-code">rpc_duration_seconds</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- .NET Entegrasyonu -->
+        <div class="card">
+            <h2>⚙️ .NET Core'da Prometheus Metrikleri</h2>
+
+            <h3>OpenTelemetry ile Prometheus Exporter</h3>
+            <p>OpenTelemetry modülünde eklediğimiz Prometheus exporter'ı sayesinde <span class="inline-code">/metrics</span> endpoint'i otomatik oluşturulur:</p>
+
+            <pre><code>// Program.cs — Metrics konfigürasyonu (OpenTelemetry ile)
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =&gt;
+    {
+        metrics
+            .SetResourceBuilder(resourceBuilder)
+            // ASP.NET Core metrikleri (request duration, request count vb.)
+            .AddAspNetCoreInstrumentation()
+            // HttpClient metrikleri (outgoing request'ler)
+            .AddHttpClientInstrumentation()
+            // .NET Runtime metrikleri (GC, ThreadPool, Memory)
+            .AddRuntimeInstrumentation()
+            // Prometheus scraping endpoint'i
+            .AddPrometheusExporter();
+    });
+
+// ...
+var app = builder.Build();
+
+// Prometheus scraping endpoint'ini aktifleştir
+// Bu, /metrics endpoint'ini oluşturur
+app.MapPrometheusScrapingEndpoint();
+</code></pre>
+
+            <h3>Özel (Custom) Metrikler Tanımlama</h3>
+            <pre><code>using System.Diagnostics.Metrics;
+
+public class ProductMetrics
+{
+    private readonly Counter&lt;long&gt; _productCreatedCount;
+    private readonly Histogram&lt;double&gt; _productQueryDuration;
+    private readonly UpDownCounter&lt;int&gt; _activeRequests;
+
+    public ProductMetrics(IMeterFactory meterFactory)
+    {
+        var meter = meterFactory.Create("RestApi.Products");
+
+        // Counter: Toplam oluşturulan ürün sayısı
+        _productCreatedCount = meter.CreateCounter&lt;long&gt;(
+            "products.created.total",
+            description: "Toplam oluşturulan ürün sayısı");
+
+        // Histogram: Ürün sorgu süresi
+        _productQueryDuration = meter.CreateHistogram&lt;double&gt;(
+            "products.query.duration",
+            unit: "ms",
+            description: "Ürün sorgulama süresi (ms)");
+
+        // UpDownCounter: Aktif istek sayısı
+        _activeRequests = meter.CreateUpDownCounter&lt;int&gt;(
+            "products.active_requests",
+            description: "Aktif istek sayısı");
+    }
+
+    public void RecordProductCreated() =&gt; _productCreatedCount.Add(1);
+
+    public void RecordQueryDuration(double durationMs) =&gt;
+        _productQueryDuration.Record(durationMs);
+
+    public void IncrementActiveRequests() =&gt; _activeRequests.Add(1);
+    public void DecrementActiveRequests() =&gt; _activeRequests.Add(-1);
+}
+
+// DI'a kaydet
+builder.Services.AddSingleton&lt;ProductMetrics&gt;();
+
+// OpenTelemetry'ye custom meter'ı ekle
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =&gt;
+    {
+        metrics
+            .AddMeter("RestApi.Products")  // Custom meter kaydı
+            // ... diğer ayarlar
+    });</code></pre>
+
+            <h3>Controller'da Kullanım</h3>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductController : ControllerBase
+{
+    private readonly ProductMetrics _metrics;
+    private readonly ApplicationDbContext _context;
+
+    public ProductController(ApplicationDbContext context, ProductMetrics metrics)
+    {
+        _context = context;
+        _metrics = metrics;
+    }
+
+    [HttpGet]
+    public async Task&lt;IActionResult&gt; GetProducts()
+    {
+        _metrics.IncrementActiveRequests();
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            var products = await _context.Products.ToListAsync();
+            return Ok(products);
+        }
+        finally
+        {
+            sw.Stop();
+            _metrics.RecordQueryDuration(sw.ElapsedMilliseconds);
+            _metrics.DecrementActiveRequests();
+        }
+    }
+
+    [HttpPost]
+    public async Task&lt;IActionResult&gt; CreateProduct([FromBody] Product product)
+    {
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync();
+
+        _metrics.RecordProductCreated();  // Metrik kaydet
+
+        return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
+    }
+}</code></pre>
+        </div>
+
+        <!-- Prometheus Konfigürasyonu -->
+        <div class="card">
+            <h2>📝 Prometheus Konfigürasyonu</h2>
+            <p>Mevcut <span class="inline-code">prometheus.yml</span> dosyasını .NET uygulamasını da scrape edecek şekilde güncelleyin:</p>
+
+            <pre><code># prometheus.yml
+global:
+  scrape_interval: 5s          # Her 5 saniyede bir metrik topla
+  evaluation_interval: 5s       # Alert kurallarını her 5 saniyede değerlendir
+
+scrape_configs:
+  # Prometheus kendi metriklerini toplar
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  # .NET REST API metrikleri
+  - job_name: 'restapi'
+    # Mac'te docker dışından çalışan .NET uygulaması
+    static_configs:
+      - targets: ['host.docker.internal:5000']
+    # Metrics endpoint yolu
+    metrics_path: '/metrics'
+    scheme: 'http'</code></pre>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Mac Docker Notu:</strong> macOS'ta Docker container'lardan host makinedeki uygulamaya erişmek için <span class="inline-code">host.docker.internal</span> kullanılır. Linux'ta <span class="inline-code">172.17.0.1</span> veya <span class="inline-code">--network=host</span> kullanılabilir.
+            </div>
+
+            <h3>Doğrulama</h3>
+            <pre><code># .NET uygulamasının metrics endpoint'ini kontrol
+curl http://localhost:5000/metrics
+
+# Prometheus targets sayfasını kontrol
+# http://localhost:9090/targets
+# "restapi" target'ının UP durumda olduğunu doğrulayın</code></pre>
+        </div>
+
+        <!-- PromQL Sorguları -->
+        <div class="card">
+            <h2>🔍 PromQL Sorguları</h2>
+            <p>Prometheus'un sorgulama arayüzünden (<span class="inline-code">http://localhost:9090</span>) aşağıdaki sorguları deneyin:</p>
+
+            <h3>Temel Sorgular</h3>
+            <pre><code># Toplam HTTP istek sayısı
+http_server_request_duration_seconds_count
+
+# Son 5 dakikadaki istek oranı (rate)
+rate(http_server_request_duration_seconds_count[5m])
+
+# HTTP metod bazında istek oranı
+rate(http_server_request_duration_seconds_count{http_request_method="GET"}[5m])
+
+# Ortalama response süresi
+rate(http_server_request_duration_seconds_sum[5m])
+/
+rate(http_server_request_duration_seconds_count[5m])
+
+# 95. percentile response süresi
+histogram_quantile(0.95, rate(http_server_request_duration_seconds_bucket[5m]))
+
+# 99. percentile response süresi
+histogram_quantile(0.99, rate(http_server_request_duration_seconds_bucket[5m]))</code></pre>
+
+            <h3>Runtime Metrikleri</h3>
+            <pre><code># .NET process bellek kullanımı
+process_runtime_dotnet_gc_heap_size_bytes
+
+# GC collection sayısı
+process_runtime_dotnet_gc_collections_count
+
+# ThreadPool aktif thread sayısı
+process_runtime_dotnet_thread_pool_threads_count</code></pre>
+
+            <h3>Custom Metrik Sorguları</h3>
+            <pre><code># Toplam oluşturulan ürün sayısı
+products_created_total
+
+# Son 1 dakikadaki ortalama sorgu süresi
+rate(products_query_duration_sum[1m]) / rate(products_query_duration_count[1m])
+
+# Aktif istek sayısı
+products_active_requests</code></pre>
+        </div>
+
+        <!-- Grafana -->
+        <div class="card">
+            <h2>📊 Grafana Dashboard Oluşturma</h2>
+
+            <h3>Adım 1: Grafana'ya Giriş</h3>
+            <ol>
+                <li>Tarayıcıda <span class="inline-code">http://localhost:3000</span> açın</li>
+                <li>Varsayılan kullanıcı: <span class="inline-code">admin</span> / <span class="inline-code">admin</span></li>
+                <li>İlk girişte şifre değişikliği istenir (Skip diyebilirsiniz)</li>
+            </ol>
+
+            <h3>Adım 2: Prometheus Data Source Ekleme</h3>
+            <ol>
+                <li><strong>Configuration → Data Sources → Add data source</strong></li>
+                <li>Prometheus seçin</li>
+                <li>URL: <span class="inline-code">http://prometheus:9090</span></li>
+                <li><strong>Save & Test</strong> butonuna tıklayın</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <strong>💡 İpucu:</strong> Grafana ve Prometheus aynı Docker network'te olduğu için, container adı (<span class="inline-code">prometheus</span>) doğrudan kullanılabilir.
+            </div>
+
+            <h3>Adım 3: Dashboard Oluşturma</h3>
+            <ol>
+                <li><strong>Dashboards → New Dashboard → Add visualization</strong></li>
+                <li>Data source olarak Prometheus seçin</li>
+                <li>Aşağıdaki panelleri ekleyin:</li>
+            </ol>
+
+            <h3>Panel 1: HTTP İstek Oranı (Time Series)</h3>
+            <pre><code># PromQL
+rate(http_server_request_duration_seconds_count[1m])
+
+# Legend: {{http_request_method}} {{http_route}}
+# Title: HTTP İstek Oranı (req/s)</code></pre>
+
+            <h3>Panel 2: Response Süresi — Percentile (Time Series)</h3>
+            <pre><code># p50 Query
+histogram_quantile(0.5, rate(http_server_request_duration_seconds_bucket[5m]))
+
+# p95 Query
+histogram_quantile(0.95, rate(http_server_request_duration_seconds_bucket[5m]))
+
+# p99 Query
+histogram_quantile(0.99, rate(http_server_request_duration_seconds_bucket[5m]))
+
+# Title: Response Süresi Percentile (sn)</code></pre>
+
+            <h3>Panel 3: Bellek Kullanımı (Gauge)</h3>
+            <pre><code># PromQL
+process_runtime_dotnet_gc_heap_size_bytes / 1024 / 1024
+
+# Unit: megabytes
+# Title: .NET Heap Bellek (MB)</code></pre>
+
+            <h3>Panel 4: HTTP Durum Kodları (Pie Chart)</h3>
+            <pre><code># PromQL
+sum by(http_response_status_code)(
+  increase(http_server_request_duration_seconds_count[5m])
+)
+
+# Title: HTTP Durum Kodu Dağılımı</code></pre>
+        </div>
+
+        <!-- Yük Testi -->
+        <div class="card">
+            <h2>🧪 Pratik: Yük Testi ile Metrik Gözlemleme</h2>
+
+            <h3>Basit Yük Testi (Terminal'den)</h3>
+            <pre><code># 100 ardışık istek gönder
+for i in $(seq 1 100); do
+  curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5000/api/products
+done
+
+# Paralel istek gönder (xargs ile)
+seq 1 50 | xargs -P 10 -I {} curl -s -o /dev/null -w "%{http_code}\n" \
+  http://localhost:5000/api/products
+
+# hey aracı ile yük testi (brew install hey)
+hey -n 1000 -c 10 http://localhost:5000/api/products</code></pre>
+
+            <div class="alert alert-success">
+                <strong>✅ Gözlem:</strong> Yük testi sırasında Grafana dashboard'unu açık tutun. İstek oranı, response süresi ve bellek kullanımı grafiklerindeki değişimleri gerçek zamanlı izleyin.
+            </div>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Modül</h2>
+            <p>Bir sonraki modülde <strong><a href="3-elasticsearch-kibana-egitim.html">Elasticsearch & Kibana ile Log Yönetimi ve Analiz</a></strong> konusuna geçeceğiz.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi & Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

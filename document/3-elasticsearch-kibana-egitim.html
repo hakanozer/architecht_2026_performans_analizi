@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticsearch & Kibana — Performans Analizi & Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --elastic: #00bfb3;
+            --kibana: #f04e98;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--elastic), #005571);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--elastic); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: #005571;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--elastic);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Elasticsearch & 📈 Kibana</h1>
+        <p>Modül 3 — Log Veritabanları, Arama Motoru ve Log Görselleştirme</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş & Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus & Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html" class="active">3 - Elasticsearch & Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik & Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html">7 - Dashboard & Görselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- ELK Stack -->
+        <div class="card">
+            <h2>📚 ELK Stack Nedir?</h2>
+            <p>ELK Stack, <strong>Elasticsearch</strong>, <strong>Logstash</strong> ve <strong>Kibana</strong>'nın birlikte kullanılmasıyla oluşan log yönetimi ve analiz platformudur.</p>
+
+            <pre><code>
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  .NET App    │───▶│  Logstash    │───▶│Elasticsearch │───▶│   Kibana     │
+│  (Log Üret)  │    │  (Topla &    │    │  (Depola &   │    │  (Görsel-    │
+│              │    │   Dönüştür)  │    │   İndeksle)  │    │   leştir)    │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+                                               ▲
+                                               │
+                                        Doğrudan yazım
+                                        (Serilog ile)
+</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bileşen</th>
+                        <th>Rol</th>
+                        <th>Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Elasticsearch</strong></td>
+                        <td>Dağıtık arama ve analiz motoru. Logları depolar ve indeksler.</td>
+                        <td>9200</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Logstash</strong></td>
+                        <td>Veri toplama, dönüştürme (parse) ve Elasticsearch'e yazma.</td>
+                        <td>5001 → 5000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kibana</strong></td>
+                        <td>Web tabanlı görselleştirme ve log analiz arayüzü.</td>
+                        <td>5601</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Elasticsearch Temelleri -->
+        <div class="card">
+            <h2>🔍 Elasticsearch Temelleri</h2>
+
+            <h3>Temel Kavramlar</h3>
+            <ul>
+                <li><strong>Index:</strong> İlişkisel veritabanındaki tablo karşılığı. Loglar bir index'e yazılır (örn: <span class="inline-code">restapi-logs-2026.04.12</span>)</li>
+                <li><strong>Document:</strong> Bir log kaydı. JSON formatında saklanır.</li>
+                <li><strong>Mapping:</strong> Document'taki alanların veri tiplerini tanımlar (string, date, integer vb.)</li>
+                <li><strong>Shard:</strong> Index'in parçalanmış alt bölümü. Paralel okuma/yazma sağlar.</li>
+                <li><strong>Replica:</strong> Shard kopyası. Yüksek erişilebilirlik (HA) sağlar.</li>
+            </ul>
+
+            <h3>Elasticsearch Sağlık Kontrolü</h3>
+            <pre><code># Cluster sağlık durumu
+curl http://localhost:9200/_cluster/health?pretty
+
+# İndeksleri listele
+curl http://localhost:9200/_cat/indices?v
+
+# Belirli bir index'in mapping'i
+curl http://localhost:9200/restapi-logs/_mapping?pretty
+
+# Basit arama
+curl "http://localhost:9200/restapi-logs/_search?q=level:Error&amp;pretty"</code></pre>
+        </div>
+
+        <!-- Serilog Entegrasyonu -->
+        <div class="card">
+            <h2>⚙️ .NET Core'dan Elasticsearch'e Log Gönderme (Serilog)</h2>
+
+            <h3>Adım 1: NuGet Paketleri</h3>
+            <pre><code># Serilog paketleri
+dotnet add package Serilog.AspNetCore
+dotnet add package Serilog.Sinks.Elasticsearch
+dotnet add package Serilog.Enrichers.Environment
+dotnet add package Serilog.Enrichers.Process
+dotnet add package Serilog.Enrichers.Thread
+dotnet add package Serilog.Formatting.Elasticsearch</code></pre>
+
+            <h3>Adım 2: Program.cs'de Serilog Yapılandırması</h3>
+            <pre><code>using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Formatting.Elasticsearch;
+
+// Serilog yapılandırması
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithMachineName()
+    .Enrich.WithProcessId()
+    .Enrich.WithThreadId()
+    // Konsola yaz
+    .WriteTo.Console()
+    // Elasticsearch'e yaz
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(
+        new Uri("http://localhost:9200"))
+    {
+        // Her gün yeni index oluştur
+        IndexFormat = $"restapi-logs-{DateTime.UtcNow:yyyy.MM.dd}",
+        AutoRegisterTemplate = true,
+        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
+        // JSON formatı
+        CustomFormatter = new ElasticsearchJsonFormatter(),
+        // Batch ayarları
+        BatchPostingLimit = 50,
+        Period = TimeSpan.FromSeconds(2),
+        // Hata durumunda dosyaya yaz
+        BufferBaseFilename = "./logs/elastic-buffer",
+        BufferFileSizeLimitBytes = 5242880, // 5MB
+    })
+    .CreateLogger();
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Serilog'u host'a bağla
+builder.Host.UseSerilog();
+
+// ...
+
+var app = builder.Build();
+
+// Request loglama middleware
+app.UseSerilogRequestLogging(options =&gt;
+{
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =&gt;
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].ToString());
+    };
+});</code></pre>
+
+            <div class="alert alert-info">
+                <strong>💡 İpucu:</strong> Serilog ile Elasticsearch'e doğrudan yazım yapılır. Logstash aracılığıyla da gönderilebilir, ancak doğrudan yazım daha basit ve düşük gecikmeli bir çözümdür.
+            </div>
+        </div>
+
+        <!-- Structured Logging -->
+        <div class="card">
+            <h2>📝 Structured Logging (Yapısal Loglama)</h2>
+
+            <h3>Neden Structured Logging?</h3>
+            <p>Geleneksel string bazlı loglama yerine, yapısal (key-value) loglama kullanmak Elasticsearch'te arama ve filtrelemeyi dramatik şekilde kolaylaştırır.</p>
+
+            <div class="alert alert-danger">
+                <strong>❌ Yanlış (Unstructured):</strong>
+                <pre><code>_logger.LogInformation("User " + userId + " created product " + productName);</code></pre>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>✅ Doğru (Structured):</strong>
+                <pre><code>_logger.LogInformation("User {UserId} created product {ProductName} with price {Price}",
+    userId, productName, price);</code></pre>
+            </div>
+
+            <h3>Controller'da Structured Logging Kullanımı</h3>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductController : ControllerBase
+{
+    private readonly ILogger&lt;ProductController&gt; _logger;
+    private readonly ApplicationDbContext _context;
+
+    public ProductController(
+        ApplicationDbContext context,
+        ILogger&lt;ProductController&gt; logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+
+    [HttpGet]
+    public async Task&lt;IActionResult&gt; GetProducts()
+    {
+        _logger.LogInformation("Getting all products");
+
+        var products = await _context.Products.ToListAsync();
+
+        _logger.LogInformation("Retrieved {ProductCount} products", products.Count);
+
+        return Ok(products);
+    }
+
+    [HttpGet("{id}")]
+    public async Task&lt;IActionResult&gt; GetProduct(int id)
+    {
+        _logger.LogInformation("Getting product with {ProductId}", id);
+
+        var product = await _context.Products.FindAsync(id);
+
+        if (product == null)
+        {
+            _logger.LogWarning("Product with {ProductId} not found", id);
+            return NotFound();
+        }
+
+        return Ok(product);
+    }
+
+    [HttpPost]
+    public async Task&lt;IActionResult&gt; CreateProduct([FromBody] Product product)
+    {
+        try
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Product created: {ProductId} - {ProductName} - Price: {Price}",
+                product.Id, product.Name, product.Price);
+
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to create product {ProductName}",
+                product.Name);
+            throw;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- Kibana Kullanımı -->
+        <div class="card">
+            <h2>📈 Kibana ile Log Analizi</h2>
+
+            <h3>Adım 1: Kibana'ya Erişim</h3>
+            <p>Tarayıcıda <span class="inline-code">http://localhost:5601</span> adresine gidin.</p>
+
+            <h3>Adım 2: Data View (Index Pattern) Oluşturma</h3>
+            <ol>
+                <li><strong>Management → Stack Management → Data Views</strong></li>
+                <li><strong>Create data view</strong> butonuna tıklayın</li>
+                <li>Name: <span class="inline-code">restapi-logs-*</span></li>
+                <li>Index pattern: <span class="inline-code">restapi-logs-*</span></li>
+                <li>Timestamp field: <span class="inline-code">@timestamp</span></li>
+                <li><strong>Save data view</strong></li>
+            </ol>
+
+            <h3>Adım 3: Discover ile Log Keşfi</h3>
+            <ol>
+                <li><strong>Analytics → Discover</strong> menüsüne gidin</li>
+                <li>Data view olarak <span class="inline-code">restapi-logs-*</span> seçin</li>
+                <li>Zaman aralığını ayarlayın (Last 15 minutes)</li>
+                <li>KQL (Kibana Query Language) ile arama yapın:</li>
+            </ol>
+
+            <pre><code># Tüm ERROR seviyesindeki loglar
+level: "Error"
+
+# Belirli bir endpoint'e ait loglar
+fields.RequestPath: "/api/products"
+
+# HTTP 500 hatalarını bul
+fields.StatusCode: 500
+
+# Belirli bir kullanıcının logları
+fields.UserId: "user123"
+
+# Birden fazla koşul
+level: "Error" AND fields.RequestPath: "/api/products"
+
+# Metin içinde arama
+message: "product" AND message: "created"</code></pre>
+
+            <h3>Adım 4: Visualize ile Görselleştirme</h3>
+            <p>Sık kullanılan Kibana görselleştirmeleri:</p>
+            <ul>
+                <li><strong>Log Hacmi (Bar Chart):</strong> Zaman bazlı log sayısı — hata spike'larını görme</li>
+                <li><strong>Hata Dağılımı (Pie Chart):</strong> Log seviyelerine göre dağılım</li>
+                <li><strong>Response Süreleri (Line Chart):</strong> Zaman bazlı ortalama response süresi</li>
+                <li><strong>Top Hatalar (Data Table):</strong> En çok tekrarlanan hata mesajları</li>
+                <li><strong>Endpoint Kullanımı (Horizontal Bar):</strong> En çok hit alan endpoint'ler</li>
+            </ul>
+        </div>
+
+        <!-- Logstash Konfigürasyonu -->
+        <div class="card">
+            <h2>📥 Logstash Pipeline Konfigürasyonu (Opsiyonel)</h2>
+            <p>Serilog'un doğrudan Elasticsearch'e yazması yerine Logstash üzerinden de yönlendirme yapılabilir:</p>
+
+            <h3>logstash.conf</h3>
+            <pre><code># logstash.conf
+input {
+  tcp {
+    port =&gt; 5000
+    codec =&gt; json_lines
+  }
+}
+
+filter {
+  # Tarih alanını parse et
+  date {
+    match =&gt; ["@timestamp", "ISO8601"]
+  }
+
+  # Log seviyesine göre tag ekle
+  if [level] == "Error" or [level] == "Fatal" {
+    mutate {
+      add_tag =&gt; ["error"]
+    }
+  }
+
+  # Gereksiz alanları kaldır
+  mutate {
+    remove_field =&gt; ["host", "port"]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts =&gt; ["http://elasticsearch:9200"]
+    index =&gt; "restapi-logs-%{+YYYY.MM.dd}"
+  }
+
+  # Debug: konsola da yazdır
+  stdout {
+    codec =&gt; rubydebug
+  }
+}</code></pre>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Not:</strong> Bu konfigürasyon <span class="inline-code">logstash.conf</span> dosyasına yazılır ve docker-compose volume olarak bağlanır. Eğitimde basitlik için Serilog'un doğrudan Elasticsearch'e yazması önerilir.
+            </div>
+        </div>
+
+        <!-- Pratik Alıştırma -->
+        <div class="card">
+            <h2>🧪 Pratik Alıştırma</h2>
+            <ol>
+                <li>Serilog paketlerini projeye ekleyin</li>
+                <li>Program.cs'e Serilog konfigürasyonunu ekleyin</li>
+                <li>Controller'lara structured logging ekleyin</li>
+                <li>Uygulamayı çalıştırın ve çeşitli istekler gönderin</li>
+                <li>Elasticsearch'te index'in oluştuğunu doğrulayın:
+                    <pre><code>curl http://localhost:9200/_cat/indices?v</code></pre>
+                </li>
+                <li>Kibana'da Data View oluşturun ve logları keşfedin</li>
+                <li>Kasıtlı hata oluşturun (örn: olmayan bir ürün ID'si) ve Kibana'da hata loglarını bulun</li>
+            </ol>
+        </div>
+
+        <!-- Sonraki Ders -->
+        <div class="card">
+            <h2>➡️ Sonraki Modül</h2>
+            <p>Bir sonraki modülde <strong><a href="4-jaeger-distributed-tracing-egitim.html">Jaeger ile Distributed Tracing</a></strong> konusuna geçeceğiz.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi & Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>

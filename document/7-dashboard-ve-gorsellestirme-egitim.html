@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard &amp; G&ouml;rselleştirme Demo — Performans Analizi &amp; Monitoring</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --info: #4285f4;
+            --success: #34a853;
+            --accent: #00695c;
+            --accent-light: #4db6ac;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--accent), #004d40);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+        .header p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.9; }
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav a:hover { background: rgba(26, 115, 232, 0.1); }
+        .nav a.active { background: var(--accent); color: white; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-light);
+        }
+        .card h3 { color: var(--text); font-size: 1.1rem; margin: 1rem 0 0.5rem; }
+        .card p, .card li { color: var(--text-light); margin-bottom: 0.5rem; }
+        .card ul, .card ol { padding-left: 1.5rem; }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+        .inline-code {
+            background: #e8eaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--danger);
+        }
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #e8f0fe; border-color: var(--info); }
+        .alert-warning { background: #fef7e0; border-color: var(--warning); }
+        .alert-success { background: #e6f4ea; border-color: var(--success); }
+        .alert-danger { background: #fce8e6; border-color: var(--danger); }
+        .demo-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--bg);
+        }
+        .demo-step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .demo-step-content { flex: 1; }
+        .demo-step-content h4 { margin-bottom: 0.25rem; color: var(--text); }
+        .demo-step-content p { margin-bottom: 0; font-size: 0.9rem; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .dashboard-url {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem 0.75rem; }
+            .card { padding: 1rem; }
+            pre { font-size: 0.75rem; padding: 0.75rem; }
+            .demo-step { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Dashboard &amp; G&ouml;rselleştirme Demo</h1>
+        <p>Mod&uuml;l 7 — Canlı Demo: Grafana Dashboardları, Kibana Analiz, Jaeger Trace, Alerting</p>
+    </div>
+
+    <nav class="nav">
+        <a href="0-giris-ve-kurulum.html">0 - Giriş &amp; Kurulum</a>
+        <a href="1-opentelemetry-egitim.html">1 - OpenTelemetry</a>
+        <a href="2-prometheus-grafana-egitim.html">2 - Prometheus &amp; Grafana</a>
+        <a href="3-elasticsearch-kibana-egitim.html">3 - Elasticsearch &amp; Kibana</a>
+        <a href="4-jaeger-distributed-tracing-egitim.html">4 - Jaeger Tracing</a>
+        <a href="5-metrik-ve-log-toplama-egitim.html">5 - Metrik &amp; Log Toplama</a>
+        <a href="6-uygulama-entegrasyonu-egitim.html">6 - Uygulama Entegrasyonu</a>
+        <a href="7-dashboard-ve-gorsellestirme-egitim.html" class="active">7 - Dashboard &amp; G&ouml;rselleştirme</a>
+    </nav>
+
+    <div class="container">
+
+        <!-- Demo Senaryo -->
+        <div class="card">
+            <h2>🎬 Demo Senaryosu</h2>
+            <p>Bu son mod&uuml;lde, t&uuml;m araçları bir arada kullanarak ger&ccedil;ek zamanlı bir demo yapacağız. Senaryo şu adımlardan oluşur:</p>
+
+            <div class="demo-step">
+                <div class="demo-step-number">1</div>
+                <div class="demo-step-content">
+                    <h4>Ortamı Hazırla</h4>
+                    <p>Docker servislerini ve .NET uygulamasını başlat, t&uuml;m dashboard'ları a&ccedil;</p>
+                </div>
+            </div>
+            <div class="demo-step">
+                <div class="demo-step-number">2</div>
+                <div class="demo-step-content">
+                    <h4>Normal Trafik Oluştur</h4>
+                    <p>API'ye normal istekler g&ouml;nder, baseline metrikleri g&ouml;zlemle</p>
+                </div>
+            </div>
+            <div class="demo-step">
+                <div class="demo-step-number">3</div>
+                <div class="demo-step-content">
+                    <h4>Y&uuml;k Testi Uygula</h4>
+                    <p>Y&uuml;ksek trafik oluştur, metriklerdeki değişimi izle</p>
+                </div>
+            </div>
+            <div class="demo-step">
+                <div class="demo-step-number">4</div>
+                <div class="demo-step-content">
+                    <h4>Hata Senaryosu</h4>
+                    <p>Kasıtlı hatalar &uuml;ret, trace ve log'larda hata analizini g&ouml;ster</p>
+                </div>
+            </div>
+            <div class="demo-step">
+                <div class="demo-step-number">5</div>
+                <div class="demo-step-content">
+                    <h4>Sorun Tespiti</h4>
+                    <p>Grafana, Kibana ve Jaeger &uuml;zerinden sorunun kaynağını bul</p>
+                </div>
+            </div>
+
+            <h3>Dashboard URL'leri</h3>
+            <p>
+                <span class="dashboard-url">📊 Grafana — localhost:3000</span>
+                <span class="dashboard-url">📈 Kibana — localhost:5601</span>
+                <span class="dashboard-url">🔗 Jaeger — localhost:16686</span>
+                <span class="dashboard-url">🔥 Prometheus — localhost:9090</span>
+            </p>
+        </div>
+
+        <!-- Grafana Dashboard Oluşturma -->
+        <div class="card">
+            <h2>📊 Grafana: REST API Performance Dashboard</h2>
+
+            <h3>Dashboard Oluşturma Adımları</h3>
+            <ol>
+                <li>Grafana'ya giriş yapın (<span class="inline-code">admin/admin</span>)</li>
+                <li><strong>Dashboards → New → New Dashboard</strong></li>
+                <li>Aşağıdaki panelleri sırasıyla ekleyin:</li>
+            </ol>
+
+            <h3>Panel 1: HTTP İstek Oranı (Time Series)</h3>
+            <pre><code>Title: "HTTP İstek Oranı (req/s)"
+Type: Time Series
+Query A: rate(http_server_request_duration_seconds_count[1m])
+Legend: {{http_request_method}} {{url_scheme}}://{{server_address}}{{http_route}}</code></pre>
+
+            <h3>Panel 2: Response S&uuml;resi Percentile (Time Series)</h3>
+            <pre><code>Title: "Response S&uuml;resi (saniye)"
+Type: Time Series
+
+Query A (p50):
+  histogram_quantile(0.50, rate(http_server_request_duration_seconds_bucket[5m]))
+  Legend: p50
+
+Query B (p95):
+  histogram_quantile(0.95, rate(http_server_request_duration_seconds_bucket[5m]))
+  Legend: p95
+
+Query C (p99):
+  histogram_quantile(0.99, rate(http_server_request_duration_seconds_bucket[5m]))
+  Legend: p99</code></pre>
+
+            <h3>Panel 3: Toplam İstek Sayısı (Stat)</h3>
+            <pre><code>Title: "Toplam İstek Sayısı"
+Type: Stat
+Query: sum(http_server_request_duration_seconds_count)
+Color mode: Background</code></pre>
+
+            <h3>Panel 4: HTTP Durum Kodları (Pie Chart)</h3>
+            <pre><code>Title: "HTTP Status Code Dağılımı"
+Type: Pie Chart
+Query: sum by(http_response_status_code)(
+  increase(http_server_request_duration_seconds_count[5m])
+)
+Legend: {{http_response_status_code}}</code></pre>
+
+            <h3>Panel 5: .NET Runtime Metrikleri (Gauge + Time Series)</h3>
+            <pre><code>Title: "GC Heap Bellek (MB)"
+Type: Gauge
+Query: process_runtime_dotnet_gc_heap_size_bytes / 1024 / 1024
+Unit: MB
+Min: 0, Max: 500
+
+Title: "GC Collections"
+Type: Time Series
+Query: increase(process_runtime_dotnet_gc_collections_count[1m])
+Legend: Gen {{generation}}</code></pre>
+
+            <h3>Panel 6: Aktif HTTP Bağlantıları (Time Series)</h3>
+            <pre><code>Title: "Aktif HTTP Bağlantıları"
+Type: Time Series
+Query: http_server_active_requests</code></pre>
+        </div>
+
+        <!-- Grafana JSON Export -->
+        <div class="card">
+            <h2>💾 Grafana Dashboard JSON (Import)</h2>
+            <p>Aşağıdaki JSON'u Grafana'da <strong>Dashboards → Import → Import via dashboard JSON model</strong> ile y&uuml;kleyerek hazır bir dashboard oluşturabilirsiniz:</p>
+
+            <pre><code>{
+  "dashboard": {
+    "title": "REST API Performance Dashboard",
+    "tags": ["restapi", "performance", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "HTTP İstek Oranı (req/s)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [{
+          "expr": "rate(http_server_request_duration_seconds_count[1m])",
+          "legendFormat": "{{http_request_method}} {{http_route}}"
+        }],
+        "datasource": { "type": "prometheus" }
+      },
+      {
+        "title": "Response S&uuml;resi Percentile",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(http_server_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(http_server_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(http_server_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "datasource": { "type": "prometheus" }
+      },
+      {
+        "title": "Toplam İstek",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+        "targets": [{
+          "expr": "sum(http_server_request_duration_seconds_count)"
+        }],
+        "datasource": { "type": "prometheus" }
+      },
+      {
+        "title": "GC Heap Bellek (MB)",
+        "type": "gauge",
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+        "targets": [{
+          "expr": "process_runtime_dotnet_gc_heap_size_bytes / 1024 / 1024"
+        }],
+        "datasource": { "type": "prometheus" },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "decmbytes",
+            "min": 0,
+            "max": 500
+          }
+        }
+      }
+    ],
+    "time": { "from": "now-15m", "to": "now" },
+    "refresh": "5s"
+  }
+}</code></pre>
+        </div>
+
+        <!-- Kibana Dashboard -->
+        <div class="card">
+            <h2>📈 Kibana: Log Analiz Dashboard</h2>
+
+            <h3>Data View Oluşturma</h3>
+            <ol>
+                <li><strong>Stack Management → Data Views → Create data view</strong></li>
+                <li>Name: <span class="inline-code">RestApi Logs</span></li>
+                <li>Index pattern: <span class="inline-code">restapi-logs-*</span></li>
+                <li>Timestamp field: <span class="inline-code">@timestamp</span></li>
+            </ol>
+
+            <h3>Kibana Dashboard Panelleri</h3>
+
+            <h4>Panel 1: Log Hacmi (Bar Chart)</h4>
+            <ol>
+                <li><strong>Dashboard → Create visualization</strong></li>
+                <li>Visualization type: <strong>Bar vertical</strong></li>
+                <li>Horizontal axis: <span class="inline-code">@timestamp</span> (Date histogram)</li>
+                <li>Vertical axis: Count</li>
+                <li>Break down by: <span class="inline-code">level</span> field</li>
+            </ol>
+
+            <h4>Panel 2: Hata Dağılımı (Donut Chart)</h4>
+            <ol>
+                <li>Visualization type: <strong>Donut</strong></li>
+                <li>Slice by: <span class="inline-code">level</span> field</li>
+                <li>Metric: Count</li>
+            </ol>
+
+            <h4>Panel 3: En Çok Hata Veren Endpoint'ler (Data Table)</h4>
+            <ol>
+                <li>Visualization type: <strong>Table</strong></li>
+                <li>Filter: <span class="inline-code">level: "Error" OR level: "Warning"</span></li>
+                <li>Rows: Top values of <span class="inline-code">fields.RequestPath</span></li>
+                <li>Metric: Count</li>
+            </ol>
+
+            <h4>Panel 4: Son Hatalar (Saved Search)</h4>
+            <ol>
+                <li><strong>Discover</strong> se&ccedil;in</li>
+                <li>Filter: <span class="inline-code">level: "Error"</span></li>
+                <li>Columns: @timestamp, level, message, fields.RequestPath, fields.StatusCode</li>
+                <li>Save as panel to dashboard</li>
+            </ol>
+        </div>
+
+        <!-- Canlı Demo Script -->
+        <div class="card">
+            <h2>🎭 Canlı Demo Scripti</h2>
+
+            <h3>Hazırlık</h3>
+            <pre><code># Terminal 1: Docker servisleri
+cd RestApi
+docker compose up -d
+docker compose ps
+
+# Terminal 2: .NET uygulaması
+cd RestApi/RestApi
+dotnet run
+
+# Tarayıcı sekmeleri a&ccedil;:
+# 1. Grafana  → http://localhost:3000
+# 2. Kibana   → http://localhost:5601
+# 3. Jaeger   → http://localhost:16686
+# 4. Terminal → Trafik &uuml;retici</code></pre>
+
+            <h3>Senaryo 1: Normal Trafik</h3>
+            <pre><code># Birka&ccedil; normal istek g&ouml;nder
+for i in $(seq 1 20); do
+  curl -s http://localhost:5000/api/products &gt; /dev/null
+  sleep 0.5
+done
+
+echo "✅ Normal trafik g&ouml;nderildi"
+# → Grafana'da d&uuml;ş&uuml;k ve stabil istek oranı g&ouml;r&uuml;l&uuml;r
+# → Kibana'da Information seviyesinde loglar g&ouml;r&uuml;l&uuml;r
+# → Jaeger'da başarılı trace'ler g&ouml;r&uuml;l&uuml;r</code></pre>
+
+            <h3>Senaryo 2: Y&uuml;k Testi</h3>
+            <pre><code># Y&uuml;ksek trafik oluştur
+for i in $(seq 1 200); do
+  curl -s http://localhost:5000/api/products &gt; /dev/null &amp;
+done
+wait
+
+echo "✅ Y&uuml;k testi tamamlandı"
+# → Grafana'da istek oranı spike g&ouml;r&uuml;l&uuml;r
+# → Response s&uuml;resi artar (p95, p99)
+# → GC Heap kullanımı artar
+# → Aktif bağlantı sayısı y&uuml;kselir</code></pre>
+
+            <h3>Senaryo 3: Hata &Uuml;retimi</h3>
+            <pre><code># 404 hataları &uuml;ret
+for i in $(seq 1 50); do
+  curl -s http://localhost:5000/api/products/$((RANDOM % 10000 + 1000)) &gt; /dev/null
+done
+
+# 401 hataları &uuml;ret (yetkisiz erişim)
+for i in $(seq 1 30); do
+  curl -s http://localhost:5000/api/notes &gt; /dev/null
+done
+
+# Ge&ccedil;ersiz JSON ile 400 hatası
+for i in $(seq 1 20); do
+  curl -s -X POST http://localhost:5000/api/products \
+    -H "Content-Type: application/json" \
+    -d '{"invalid": true}' &gt; /dev/null
+done
+
+echo "✅ Hata senaryoları tamamlandı"
+# → Grafana'da HTTP status code dağılımı değişir
+# → Kibana'da Error ve Warning logları artar
+# → Jaeger'da hatalı trace'ler kırmızı g&ouml;r&uuml;n&uuml;r</code></pre>
+
+            <h3>Senaryo 4: Sorun Analizi (Root Cause Analysis)</h3>
+            <pre><code># 1. Grafana'da HTTP 500 hatalarının arttığı zamanı belirle
+#    → Status code pie chart'ta 500'lerin oranına bak
+
+# 2. Kibana'da o zaman aralığındaki ERROR loglarını filtrele
+#    → level: "Error" AND @timestamp > "..."
+#    → Hata mesajından detay al
+
+# 3. Hata logundaki TraceId'yi kopyala
+
+# 4. Jaeger'da TraceId ile arama yap
+#    → Hangi span'de hata oluştuğunu g&ouml;r
+#    → Span detaylarından root cause'u belirle
+
+# Bu akış "single pane of glass" monitoring yaklaşımını g&ouml;sterir:
+# Metrik (Grafana) → Log (Kibana) → Trace (Jaeger)</code></pre>
+        </div>
+
+        <!-- Grafana Alerting -->
+        <div class="card">
+            <h2>🔔 Grafana Alerting (Uyarı Sistemi)</h2>
+
+            <h3>Alert Rule Oluşturma</h3>
+            <ol>
+                <li><strong>Alerting → Alert rules → New alert rule</strong></li>
+                <li>Rule name: <span class="inline-code">High Error Rate</span></li>
+                <li>Query:
+                    <pre><code># Hata oranı (%5'ten fazlaysa uyarı)
+sum(rate(http_server_request_duration_seconds_count{http_response_status_code=~"5.."}[5m]))
+/
+sum(rate(http_server_request_duration_seconds_count[5m]))
+> 0.05</code></pre>
+                </li>
+                <li>Evaluation: Every 1m for 5m</li>
+                <li>Condition: when last() of A is above 0.05</li>
+            </ol>
+
+            <h3>&Ouml;rnek Alert Kuralları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alert</th>
+                        <th>Koşul</th>
+                        <th>&Ouml;nem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>High Error Rate</td>
+                        <td>HTTP 5xx oranı &gt; %5</td>
+                        <td>🔴 Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Slow Response</td>
+                        <td>p95 response time &gt; 2 saniye</td>
+                        <td>🟡 Warning</td>
+                    </tr>
+                    <tr>
+                        <td>High Memory</td>
+                        <td>GC Heap &gt; 300MB</td>
+                        <td>🟡 Warning</td>
+                    </tr>
+                    <tr>
+                        <td>Service Down</td>
+                        <td>Prometheus target UP = 0</td>
+                        <td>🔴 Critical</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Özet -->
+        <div class="card">
+            <h2>📋 Eğitim &Ouml;zeti</h2>
+
+            <h3>G&uuml;n 1 — Debugging &amp; Performance Tools (Tamamlandı)</h3>
+            <ul>
+                <li>✅ WinDbg kurulumu ve kullanımı</li>
+                <li>✅ Visual Studio Performance Profiler</li>
+                <li>✅ .NET Diagnostic Tools</li>
+                <li>✅ Docker ortam kurulumu</li>
+            </ul>
+
+            <h3>G&uuml;n 2 — Monitoring, Logging, OpenTelemetry</h3>
+            <ul>
+                <li>✅ OpenTelemetry kavramları ve .NET entegrasyonu</li>
+                <li>✅ Prometheus ile metrik toplama</li>
+                <li>✅ Jaeger ile distributed tracing</li>
+                <li>✅ Active vs Passive Monitoring</li>
+                <li>✅ Log seviyeleri ve structured logging</li>
+            </ul>
+
+            <h3>G&uuml;n 3 — Log Databases, Visualization, Demo</h3>
+            <ul>
+                <li>✅ Elasticsearch &amp; Kibana ile log y&ouml;netimi</li>
+                <li>✅ Serilog entegrasyonu</li>
+                <li>✅ Grafana dashboard oluşturma</li>
+                <li>✅ Log-Trace korelasyonu</li>
+                <li>✅ Canlı demo ve sorun analizi</li>
+                <li>✅ Alerting yapılandırması</li>
+            </ul>
+
+            <h3>Araç &Ouml;zet Tablosu</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Araç</th>
+                        <th>Veri Tipi</th>
+                        <th>Rol</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OpenTelemetry</td>
+                        <td>Traces + Metrics + Logs</td>
+                        <td>Telemetri veri toplama SDK'sı</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>OTel Collector</td>
+                        <td>Traces + Metrics + Logs</td>
+                        <td>Veri y&ouml;nlendirme ve işleme</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Prometheus</td>
+                        <td>Metrics</td>
+                        <td>Metrik toplama ve sorgulama (PromQL)</td>
+                        <td>:9090</td>
+                    </tr>
+                    <tr>
+                        <td>Grafana</td>
+                        <td>Metrics (g&ouml;rsel)</td>
+                        <td>Dashboard ve alerting</td>
+                        <td>:3000</td>
+                    </tr>
+                    <tr>
+                        <td>Jaeger</td>
+                        <td>Traces</td>
+                        <td>Distributed tracing ve analiz</td>
+                        <td>:16686</td>
+                    </tr>
+                    <tr>
+                        <td>Elasticsearch</td>
+                        <td>Logs</td>
+                        <td>Log depolama ve arama</td>
+                        <td>:9200</td>
+                    </tr>
+                    <tr>
+                        <td>Kibana</td>
+                        <td>Logs (g&ouml;rsel)</td>
+                        <td>Log g&ouml;rselleştirme ve analiz</td>
+                        <td>:5601</td>
+                    </tr>
+                    <tr>
+                        <td>Serilog</td>
+                        <td>Logs</td>
+                        <td>.NET loglama k&uuml;t&uuml;phanesi</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="card">
+            <h2>⭐ Production Best Practices</h2>
+
+            <h3>Monitoring</h3>
+            <ul>
+                <li>Her servis i&ccedil;in RED metrikleri izleyin: <strong>R</strong>ate, <strong>E</strong>rror rate, <strong>D</strong>uration</li>
+                <li>SLI/SLO tanımlayın: %99.9 uptime, p99 &lt; 500ms gibi</li>
+                <li>Alert fatigue'den ka&ccedil;ının: Sadece actionable alert'ler tanımlayın</li>
+                <li>Dashboard'ları takıma &ouml;zel oluşturun (overview, detail, debug)</li>
+            </ul>
+
+            <h3>Logging</h3>
+            <ul>
+                <li>Her zaman structured logging kullanın</li>
+                <li>Hassas veriyi loglarda maskeleyeyin (PII, şifreler)</li>
+                <li>Log retention policy belirleyin (30, 60, 90 g&uuml;n)</li>
+                <li>Production'da minimum Information seviyesinde loglayın</li>
+            </ul>
+
+            <h3>Tracing</h3>
+            <ul>
+                <li>Production'da sampling kullanın (%1-%10 arası)</li>
+                <li>İş mantığı span'leri ekleyin (sadece HTTP span'leri yetmez)</li>
+                <li>Error span'lere exception detayı eklemeyi unutmayın</li>
+                <li>Trace context propagation'ı t&uuml;m servisler arasında sağlayın</li>
+            </ul>
+
+            <h3>Genel</h3>
+            <ul>
+                <li>Observability'yi uygulama geliştirme s&uuml;recinin parçası yapın (shift-left)</li>
+                <li>Monitoring altyapısını da izleyin (meta-monitoring)</li>
+                <li>Runbook'lar hazırlayın: Alert geldiğinde ne yapılacak?</li>
+                <li>Regular olarak chaos engineering pratikleri yapın</li>
+            </ul>
+        </div>
+
+        <!-- Kaynaklar -->
+        <div class="card">
+            <h2>📚 Faydalı Kaynaklar</h2>
+            <ul>
+                <li><strong>OpenTelemetry Docs:</strong> <span class="inline-code">https://opentelemetry.io/docs/</span></li>
+                <li><strong>.NET OpenTelemetry:</strong> <span class="inline-code">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-with-otel</span></li>
+                <li><strong>Prometheus Docs:</strong> <span class="inline-code">https://prometheus.io/docs/</span></li>
+                <li><strong>Grafana Docs:</strong> <span class="inline-code">https://grafana.com/docs/</span></li>
+                <li><strong>Elastic Stack:</strong> <span class="inline-code">https://www.elastic.co/guide/</span></li>
+                <li><strong>Jaeger Docs:</strong> <span class="inline-code">https://www.jaegertracing.io/docs/</span></li>
+                <li><strong>Serilog:</strong> <span class="inline-code">https://serilog.net/</span></li>
+                <li><strong>PromQL Cheat Sheet:</strong> <span class="inline-code">https://promlabs.com/promql-cheat-sheet/</span></li>
+            </ul>
+        </div>
+
+        <!-- Tamamlandı -->
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-color: var(--success);">
+            <h2 style="color: var(--success); border-color: var(--success);">🎉 Eğitim Tamamlandı!</h2>
+            <p style="font-size: 1.1rem; margin: 1rem 0;">
+                Performans Analizi &amp; Monitoring eğitimini başarıyla tamamladınız.
+                Artık .NET Core uygulamalarınızda kapsamlı bir observability altyapısı kurabilirsiniz.
+            </p>
+            <p>
+                <a href="0-giris-ve-kurulum.html" class="dashboard-url" style="background: var(--success);">📚 Eğitimi Baştan İncele</a>
+            </p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Performans Analizi &amp; Monitoring Eğitimi — Architecht Bilişim | 2026</p>
+    </div>
+</body>
+</html>
